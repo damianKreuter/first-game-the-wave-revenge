@@ -7,15 +7,17 @@ import AyudaExtra.ayudaExtra;
 import HUD.HUDPrincipal;
 import Jefes.JefeComun;
 import Jefes.proyectilesJefe;
+import Jugador.Player;
 import Menu.Menu2;
 import base.Handler;
 import base.HandlerEnemigo;
 import base.ID;
 import base.JuegoBase;
+import personajes.Enemigo;
+import personajes.EnemigoMuyDificil;
 import personajes.EnemigoQuePersigue;
 import personajes.EnemigoQueVuelve;
 import personajes.GameObject;
-import personajes.Player;
 import personajes.basicEnemy;
 import personajes.enemigoBorde;
 import personajes.fastenemy;
@@ -33,7 +35,11 @@ public class Spawn {
 	
 	private GameObject player;
 	private Menu2 menu;
-	private boolean hayJugador;
+	private boolean hayJugador, hayEnemigoBorde;
+	
+	private int enemigosComunes, enemigoRapido, enemigoInteligente, enemigosQueVuelven, cantidadRayos;
+	
+	
 	
 	public Spawn(HandlerEnemigo handler, HUDPrincipal h, Handler hh, Menu2 menu) {
 		this.handlerEnemigo = handler;
@@ -44,12 +50,20 @@ public class Spawn {
 		salioJefe = false;
 		hayRayoDisponible = true;
 		this.menu = menu;
-		
+		hayEnemigoBorde = false;
 		for(int i = 0; i < hh.object.size(); i++) {
 			if(hh.object.get(i).getId() == ID.Player) {
 				player = hh.object.get(i);
 			}
 		}
+		
+		enemigoInteligente = 0;
+		cantidadRayos = 0;
+		enemigosQueVuelven = 0;
+		enemigosComunes = 0;
+		enemigoRapido = 0;
+		enemigoInteligente = 0;
+		cantidadRayos = 0;
 		
 	}
 	
@@ -76,25 +90,158 @@ public class Spawn {
 		hayJugador = false;
 	}
 	
+	private void cambiarCantidadDeEnemigos() {
+		int nivel = HUD.getNivel();
+		if(HUD.getNivel() == 1) {
+			enemigosComunes = nivel;
+			enemigosQueVuelven = nivel;
+			
+			cantidadRayos = nivel;
+			
+		}
+		if(HUD.getNivel() == 2) {
+			enemigosComunes = nivel;
+			enemigosQueVuelven = nivel;
+			cantidadRayos = 1;
+		}
+		if(HUD.getNivel() == 3) {
+			enemigosComunes = nivel;
+			cantidadRayos = 2;
+		}
+		if(HUD.getNivel() == 4) {
+			enemigosComunes = 5;
+			enemigoRapido = 2;
+			enemigosQueVuelven = 4;
+			
+		}
+		if(HUD.getNivel() == 5) {
+			enemigosComunes = 6;
+			enemigoRapido = 4;
+			enemigosQueVuelven = 5;
+			cantidadRayos = 4;
+		}
+		if(HUD.getNivel() == 6) {
+			enemigosComunes = 7;
+			enemigoRapido = 5;
+			enemigosQueVuelven = 6;
+			enemigoInteligente = 2;
+		}
+		if(HUD.getNivel() == 7) {
+			enemigosComunes = 8;
+			enemigoRapido = 5;
+			enemigosQueVuelven = 8;
+			enemigoInteligente = 3;
+			
+		}
+		if(HUD.getNivel() == 8) {
+			enemigosComunes = 10;
+			enemigoRapido = 6;
+			enemigosQueVuelven = 10;
+			enemigoInteligente = 4;
+			cantidadRayos = 5;
+		}
+		if(HUD.getNivel() == 9) {
+			enemigosComunes = 10;
+			enemigoRapido = 6;
+			enemigosQueVuelven = 10;
+			enemigoInteligente = 6;
+			cantidadRayos = 6;
+		}
+	}
+	
+	private void cargarEnemigosBasico() {
+		if(enemigosComunes != 0) {
+			int cantidad = ayudaExtra.enemigoEsDeID(handlerEnemigo, ID.BasicEnemy);
+			while(cantidad < enemigosComunes) {
+				handlerEnemigo.addObject(new basicEnemy(r.nextInt(JuegoBase.ANCHO), noEnHUB(), handlerEnemigo, handler));
+				cantidad++;
+			}
+		}
+	}
+	
+	private void cargarEnemigosRapidos() {
+		if(enemigoRapido != 0) {
+			int cantidad = ayudaExtra.enemigoEsDeID(handlerEnemigo, ID.EnemigoRapido);
+			while(cantidad < enemigoRapido) {
+				crearEnemigoRapido();
+				cantidad++;
+			}
+		}
+	}
+	
+	private void cargarEnemigosInteligentes() {
+		if(enemigoInteligente != 0) {
+			int cantidad = ayudaExtra.enemigoEsDeID(handlerEnemigo, ID.EnemigoMuyDificil);
+			while(cantidad < enemigoInteligente) {
+				handlerEnemigo.addObject(new EnemigoMuyDificil(r.nextInt(JuegoBase.ANCHO), noEnHUB(), handlerEnemigo, handler));
+				cantidad++;
+			}
+		}
+	}
+	
+	private void cargarEnemigosRayo() {
+		if(cantidadRayos != 0) {
+			int cantidad = ayudaExtra.enemigoEsDeID(handlerEnemigo, ID.Laser);
+			while(cantidad < cantidadRayos) {
+				crearLaserInteligente();
+			}
+		}
+	}
+	
+	
 	public void tick() {
 		buscarJugador();
-		/*
-		if(HUD.getPuntaje() >= 100*HUD.getNivel() && HUD.getNivel() < 4) {
-			HUD.setNivel(HUD.getNivel()+1);
-			crearEnemigoQueVuelve(handlerEnemigo, handler);
+		cambiarCantidadDeEnemigos();
+		cargarEnemigos();
+
+		//NIVEL FINAL
+		if(HUD.getNivel() == 10 && salioJefe == false) {
+			enemigoInteligente = 0;
+			cantidadRayos = 0;
+			enemigosQueVuelven = 0;
+			enemigosComunes = 0;
+			enemigoRapido = 0;
+			enemigoInteligente = 0;
+			cantidadRayos = 0;
+			eliminarEnemigosQueNoPersiguen();
+			handlerEnemigo.addObject(new JefeComun(-80, JuegoBase.BASEALTURAHUD +20, handlerEnemigo, handler, menu.hudPrincipalMenu(), this));
+			salioJefe = true;
 			
-			handlerEnemigo.addObject(new EnemigoQuePersigue(r.nextInt(JuegoBase.ANCHO), r.nextInt(JuegoBase.ALTO), handlerEnemigo, handler));
-	//		handlerEnemigo.addObject(new basicEnemy(r.nextInt(JuegoBase.ANCHO), r.nextInt(JuegoBase.ALTO), ID.BasicEnemy, handlerEnemigo, handler));
-	//		handlerEnemigo.addObject(new basicEnemy(r.nextInt(JuegoBase.ANCHO), noEnHUB(), handlerEnemigo, handler));
-	//		handlerEnemigo.addObject(new fastenemy(r.nextInt(JuegoBase.ANCHO), noEnHUB(), handlerEnemigo, handler));
+	//		handlerEnemigo.addObject(new EnemigoQuePersigue(r.nextInt(JuegoBase.ANCHO), r.nextInt(JuegoBase.ALTO), handlerEnemigo, handler));
 		}
-		if(HUD.getNivel() == 4 && HUD.getPuntaje() >= 100*HUD.getNivel()) {
-			HUD.setNivel(HUD.getNivel()+1);
-			crearLaser();
-	//		crearEnemigoQueVuelve(handlerEnemigo, handler);
-			
-			handlerEnemigo.addObject(new fastenemy(r.nextInt(JuegoBase.ANCHO), noEnHUB(), handlerEnemigo, handler));
-			
+		if(hayRayoDisponible && salioJefe == true) {
+			crearLaserInteligente();
+		}
+		HUD.setPuntaje(HUD.getPuntaje()+1);
+	}
+
+	private void cargarEnemigos() {
+		cargarEnemigosBasico();
+		cargarEnemigosRapidos();
+		cargarEnemigosQueVuelve();
+		cargarEnemigosInteligentes();
+//		cargarEnemigosRayo();
+		
+	}
+	
+	private void cargarEnemigosQueVuelve() {
+		if(enemigosComunes != 0) {
+			int cantidad = ayudaExtra.enemigoEsDeID(handlerEnemigo, ID.EnemigoQueVuelve);
+			while(cantidad < enemigosComunes) {
+				crearEnemigoQueVuelve();
+				cantidad++;
+			}
+		}
+	}
+	
+	private void crearEnemigoRapido() {
+		
+		//falta el tema la cantidad
+		handlerEnemigo.addObject(new fastenemy(r.nextInt(JuegoBase.ANCHO), noEnHUB(), handlerEnemigo, handler));
+	}
+	
+	private void crearEnemigoBorde() {
+		if(!hayEnemigoBorde) {
 			//HORIZONTAL ABAJO
 			handlerEnemigo.addObject(new enemigoBorde(JuegoBase.ANCHO-30, JuegoBase.ALTO-35, 'H', 'B', handlerEnemigo, handler));	
 					
@@ -107,27 +254,21 @@ public class Spawn {
 			//LATERAL DERECHA
 			handlerEnemigo.addObject(new enemigoBorde(JuegoBase.ANCHO-15, JuegoBase.ALTURAJUEGO-50, 'L', 'B', handlerEnemigo, handler));
 			
+			hayEnemigoBorde = true;
 		}
-		*/
-		
-		
-		if(HUD.getNivel() == 1 && salioJefe == false) {
-			
-			handlerEnemigo.addObject(new JefeComun(-80, JuegoBase.BASEALTURAHUD +20, handlerEnemigo, handler, menu.hudPrincipalMenu(), this));
-			salioJefe = true;
-			handlerEnemigo.addObject(new EnemigoQuePersigue(r.nextInt(JuegoBase.ANCHO), r.nextInt(JuegoBase.ALTO), handlerEnemigo, handler));
+	}
+	
+	private void eliminarEnemigosQueNoPersiguen() {
+		for(int i = 0; i < handlerEnemigo.object.size(); i++) {
+			GameObject tempObject = handlerEnemigo.object.get(i);
+			if(ayudaExtra.esUnEnemigoQuePersigue(tempObject)) {
+				handlerEnemigo.removeObject(tempObject);
+			}
 		}
-		if(hayRayoDisponible && salioJefe == true) {
-			crearLaserInteligente();
-		}
-		HUD.setPuntaje(HUD.getPuntaje()+1);
 	}
 	
 	
-	
-	
-	
-	public void crearEnemigoQueVuelve(HandlerEnemigo handE, Handler hand) {
+	public void crearEnemigoQueVuelve() {
 		int xSeleted, ySelected;
 		int result = ayudaExtra.numeroRandomInt(0, 4);
 		String tipo;
@@ -170,7 +311,7 @@ public class Spawn {
 		maximo = JuegoBase.ALTURAJUEGO/2 + JuegoBase.BASEALTURAHUD;
 		ySelected = JuegoBase.BASEALTURAHUD;
 		*/
-		handlerEnemigo.addObject(new EnemigoQueVuelve(xSeleted, ySelected, handE, hand, maximo, tipo));
+		handlerEnemigo.addObject(new EnemigoQueVuelve(xSeleted, ySelected, handlerEnemigo, handler, maximo, tipo));
 	}
 	
 	
@@ -235,6 +376,21 @@ public class Spawn {
 		return handlerEnemigo;
 	}
 	
+	public void vaciarHandlerEnemigo() {
+		while(handlerEnemigo.object.size() > 0) {
+			GameObject tempObject = handlerEnemigo.object.get(0);
+			handlerEnemigo.removeObject(tempObject);
+		}
+		enemigoInteligente = 0;
+		cantidadRayos = 0;
+		enemigosQueVuelven = 0;
+		enemigosComunes = 0;
+		enemigoRapido = 0;
+		enemigoInteligente = 0;
+		cantidadRayos = 0;
+		salioJefe = false;
+	}
+	
 	private GameObject obtenerJefe() {
 		GameObject pp = null;
 		for(int i = 0; i < handlerEnemigo.object.size(); i++) {
@@ -244,4 +400,5 @@ public class Spawn {
 		}
 		return pp;
 	}
+	
 }

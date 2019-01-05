@@ -16,5 +16,6 @@ public enum ID {
 	EnemigoMuyDificil,
 	Laser,
 	JefeComun,
-	ProyectilesJefe
+	ProyectilesJefe,
+	ParticulasMuerte
 }

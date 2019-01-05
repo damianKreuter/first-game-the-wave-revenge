@@ -12,9 +12,9 @@ public class HUDPrincipal {
 	
 	private long tiempoSegundos = 0;
 	private int puntaje = 0;
-	private int nivel = 1;
+	public int nivel = 1;
 	
-	public static long vidaEnemigoHUD = 1;
+	public static long vidaJefeHUD = 1;
 	private long milliseconds = 1000000;
 	private static long vidaOriginalEnemigo = 1;;
 	public static boolean hayJefe = false;
@@ -30,6 +30,10 @@ public class HUDPrincipal {
 		verdeValor = JuegoBase.clamp((int)verdeValor, 0, 255);
 		verdeValor = VIDA * 0.02;
 		
+		if(puntaje > (100*nivel)) {
+			nivel++;
+		}
+		
 	}
 	
 	public void render(Graphics g) {
@@ -38,10 +42,10 @@ public class HUDPrincipal {
 		g.setColor(Color.white);
 		g.fillRect(8, 14, 202, 17);
 		g.drawString("Puntaje: " + puntaje, 250, 20);
-		g.drawString("Nivel: " + VIDA, 250, 30);
+		g.drawString("Nivel: " + nivel, 250, 30);
 		
 		
-		g.drawString("VIDA JEFE " + vidaEnemigoHUD, 450, 30);
+		g.drawString("VIDA JEFE " + vidaJefeHUD, 450, 30);
 		
 		
 		g.setColor(new Color(75, (int)verdeValor, 0));
@@ -51,30 +55,31 @@ public class HUDPrincipal {
 		
 		if(hayJefe) {
 			//ESTO LO HAGO PARA EVITAR LA DIVISIÓN POR 0
-			if(vidaEnemigoHUD == 0) {
-				vidaEnemigoHUD = -1;
+			if(vidaJefeHUD == 0) {
+				vidaJefeHUD = -1;
 			}
-			float anchoDeVidaEnemigo = 200/vidaOriginalEnemigo;
-			barraDeVida = vidaEnemigoHUD*anchoDeVidaEnemigo;
-			barra = (int)barraDeVida;
-			g.setColor(new Color(200, 0, 0));
-			g.fillRect(650, 15, barra, 15);
+			float anchoDeVidaEnemigo = vidaOriginalEnemigo/200;
+			double barraDeVidaJefe = vidaJefeHUD/anchoDeVidaEnemigo;
+			int barraJefe = (int)barraDeVidaJefe;
+			
 			g.setColor(Color.gray);
 			g.fillRect(650, 15, 200, 15);
 			g.setColor(Color.white);
 			g.fillRect(648, 14, 202, 17);
+			g.setColor(new Color(200, 0, 0));
+			g.fillRect(650, 15, barraJefe, 15);
 		}
 		
 	}
 	
 	public static void ponerVidaJefe(long vidaEnemigo) {
-		vidaEnemigoHUD = vidaEnemigo;
+		vidaJefeHUD = vidaEnemigo;
 		vidaOriginalEnemigo = vidaEnemigo;
 		hayJefe = true;
 	}
 	
 	public static void muereJefe() {
-		vidaEnemigoHUD = 1;
+		vidaJefeHUD = 1;
 		vidaOriginalEnemigo = 1;
 	}
 	
@@ -104,7 +109,6 @@ public class HUDPrincipal {
 
 	public void setNivel(int nivel) {
 		this.nivel = nivel;
-	}
-	
+	}	
 
 }

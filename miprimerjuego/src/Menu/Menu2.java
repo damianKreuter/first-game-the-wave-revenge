@@ -21,13 +21,14 @@ import javax.swing.JTextField;
 import javax.swing.JFrame;
 
 import HUD.HUDPrincipal;
+import Jugador.Player;
+import Spawn.Spawn;
 import base.HandlerEnemigo;
 import base.ID;
 import base.Handler;
 import base.JuegoBase;
 import base.JuegoBase.ESTADO;
 import base.Ventana;
-import personajes.Player;
 
 
 
@@ -64,15 +65,16 @@ public class Menu2 extends JFrame implements MouseListener
 	
 	private boolean enCaja1, enCaja2, enCaja3;
 	private String estado = "";
+	private JuegoBase juego;
 	
-	public Menu2(Handler handler, HandlerEnemigo handlerEnemigo, HUDPrincipal hud) {
+	public Menu2(Handler handler, HandlerEnemigo handlerEnemigo, HUDPrincipal hud, JuegoBase juegoBase) {
 		this.handler = handler;
 		this.handlerEnemigo = handlerEnemigo;
 		HUD = hud;
-		
 		degradeCaja1 = 30;
 		degradeCaja2 = 30;
 		degradeCaja3 = 30;
+		juego = juegoBase;
 		
 	}
 	
@@ -121,13 +123,14 @@ public class Menu2 extends JFrame implements MouseListener
 		
 		//VENTANA DE VICTORIA
 				if(JuegoBase.estadoJuego() == ESTADO.Victoria) {
-					//BOTON SIGUIENTE NIVEL
+					//BOTON VOLVER A JUGAR
 					if(mouseOver(mx, my, xCaja, ycaja2, anchoCaja, altoCaja)) {
 						HUD.setNivel(1);
 						HUD.setPuntaje(0);
 						JuegoBase.cambiarEstado(ESTADO.Juego);
 						handlerEnemigo.vaciarObjecto();
 						handler.vaciarPersonaje();
+						juego.comienzaElJuego();
 						handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo));
 					}
 					
@@ -142,14 +145,15 @@ public class Menu2 extends JFrame implements MouseListener
 		//BOTON COMENZAR
 		if(JuegoBase.estadoJuego() == ESTADO.Menu) {
 			if(mouseOver(mx, my, xCaja, ycaja1, anchoCaja, altoCaja)) {
+				handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo));
+				JuegoBase.cambiarEstado(ESTADO.Juego);
+				HUD.setNivel(1);
+				HUD.setPuntaje(0);
+				juego.comienzaElJuego();
+				handlerEnemigo.vaciarObjecto();
 			
-			JuegoBase.cambiarEstado(ESTADO.Juego);
-			HUD.setNivel(1);
-			HUD.setPuntaje(0);
-			handlerEnemigo.vaciarObjecto();
-			handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo));
-		}
 			}
+		}
 		
 		//BOTON AYUDA
 		if(JuegoBase.estadoJuego() == ESTADO.Menu) {
@@ -166,7 +170,7 @@ public class Menu2 extends JFrame implements MouseListener
 		}
 		
 		} else {
-			//BOTON SALIE
+			//BOTON SALIR
 			if(mouseOver(mx, my, xCaja, ycaja3, anchoCaja, altoCaja)) {
 				System.exit(1);
 			}
@@ -179,6 +183,7 @@ public class Menu2 extends JFrame implements MouseListener
 				HUD.setPuntaje(0);
 				JuegoBase.cambiarEstado(ESTADO.Juego);
 				handlerEnemigo.vaciarObjecto();
+				juego.comienzaElJuego();
 				handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo));
 			}
 		}
@@ -225,7 +230,7 @@ public class Menu2 extends JFrame implements MouseListener
 			g.setColor(Color.white);
 			g.drawRect(xCaja, ycaja3, anchoCaja, altoCaja);
 			
-			
+			handler.addObject(new reflejoBoton(xCaja, ycaja3, ID.Cola, new Color(255, 27, 27), 200, altoCaja, 0.05f, handler, degradeCaja3)); 
 			
 			
 			g.setFont(fnt);
@@ -236,13 +241,16 @@ public class Menu2 extends JFrame implements MouseListener
 		//VENTANA FIN DE PARTIDA, SE ACTIVA CUANDO EL, O LOS JUGADORES MUEREN
 		else if(JuegoBase.estadoJuego() == ESTADO.Fin) {
 		
+			String mensajePrincipal = "GAME OVER";
 			//PANTALLA DE FIN DE JUEGO, MUESTRA PUNTAJE Y NIVEL
-			
+			if(JuegoBase.haGanado()) {
+				mensajePrincipal = "HAS GANADO";
+			}
 			Font fnt = new Font("Arial", 1, 50);
 			
 			g.setFont(fnt);
 			g.setColor(Color.white);
-			g.drawString("GAME OVER", 100, 100);
+			g.drawString(mensajePrincipal, 100, 100);
 			fnt = new Font("Arial", 1, 25);
 			
 			g.setFont(fnt);
@@ -288,7 +296,7 @@ public class Menu2 extends JFrame implements MouseListener
 			
 			g.setFont(fnt);
 			g.setColor(Color.white);
-			g.drawString("GAME OVER", 100, 100);
+			g.drawString("HAS GANADO", 100, 100);
 			fnt = new Font("Arial", 1, 25);
 			
 			g.setFont(fnt);

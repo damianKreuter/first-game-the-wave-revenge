@@ -35,7 +35,7 @@ public class JefeComun extends Enemigo {
 		velX = velocidad;
 		velY = 0;
 		enCombate= false;
-		vidaTotal = 1000;
+		vidaTotal = 5000;
 		spawn = ss;
 		hud.ponerVidaJefe(vidaTotal);
 		tiempoAEsperar = 0;
@@ -125,7 +125,7 @@ public class JefeComun extends Enemigo {
 	}
 	
 	private boolean tieneVidaALaMitad() {
-		return HUDPrincipal.vidaEnemigoHUD < mediaVida();
+		return HUDPrincipal.vidaJefeHUD < mediaVida();
 	}
 	
 	private int mediaVida() {
@@ -138,7 +138,7 @@ public class JefeComun extends Enemigo {
 			if(tempObject.getId() == ID.Laser) {
 				if(perimetro().intersects(tempObject.perimetro())) {
 					//HACE COALISION POR LO TANTO DAÑO
-					HUDPrincipal.vidaEnemigoHUD -= tempObject.haceDanio();
+					HUDPrincipal.vidaJefeHUD -= tempObject.haceDanio();
 				}
 			}
 		}

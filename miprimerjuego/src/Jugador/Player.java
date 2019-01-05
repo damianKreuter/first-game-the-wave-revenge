@@ -1,4 +1,4 @@
-package personajes;
+package Jugador;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -10,6 +10,8 @@ import HUD.HUDBARRA;
 import HUD.HUDPrincipal;
 import base.ID;
 import base.JuegoBase;
+import personajes.Enemigo;
+import personajes.GameObject;
 import base.Handler;
 import base.HandlerEnemigo;
 import base.ID;
@@ -21,6 +23,9 @@ public class Player extends GameObject {
 	Random r = new Random();
 	Handler handler;
 	HandlerEnemigo handlerEnemigo;
+	public boolean estaVivo;
+	public boolean terminoScripMuerte;
+	int tempMuerte = 50;
 	
 	Color color = Color.green;
 	private int altura = 32, ancho = 32;
@@ -29,10 +34,10 @@ public class Player extends GameObject {
 		super(x, y, id);
 		this.handler = hand;
 		handlerEnemigo = handEnemigo;
-		// TODO Auto-generated constructor stub
-	//	velX = r.nextInt(5) +1;
-	//	velY = r.nextInt(5) +1;
+		estaVivo = true;
+		terminoScripMuerte = false;
 	}
+	
 	public Rectangle perimetro() {
 		return new Rectangle((int)x, (int)y, ancho, altura);
 	}
@@ -58,15 +63,44 @@ public class Player extends GameObject {
 		return null;
 	}
 	
+	public boolean haMuerto() {
+		return terminoScripMuerte;
+	}
+	
 	public void tick() {
 		// TODO Auto-generated method stub
-		y += velY;
-		x += velX;
-		
-		x = JuegoBase.clamp((int)x, 0, JuegoBase.ANCHO -37);
-		y = JuegoBase.clamp((int)y, JuegoBase.BASEALTURAHUD, JuegoBase.ALTO -62);
-		
-
+		if(estaVivo) {
+			y += velY;
+			x += velX;
+			
+			x = JuegoBase.clamp((int)x, 0, JuegoBase.ANCHO -37);
+			y = JuegoBase.clamp((int)y, JuegoBase.BASEALTURAHUD, JuegoBase.ALTO -62);
+			
+			if(HUDPrincipal.VIDA <=0) {
+				estaVivo = false;
+			}
+		} 
+	}
+	
+	public void morir() {
+//		handler.addObject(new ParticulasMuerte(x, y, 1, 1, handler));
+//		handler.addObject(new ParticulasMuerte(x, y, 1, -1, handler));
+//		handler.addObject(new ParticulasMuerte(x, y, -1, 1, handler));
+//		handler.addObject(new ParticulasMuerte(x, y, -1, -1, handler));
+//		while(!exiteExplosivosPosMorten()) {
+			terminoScripMuerte = true;
+//		}
+		//handler.removeObject(this);
+	}
+	
+	private boolean exiteExplosivosPosMorten() {
+		for(int i = 0; i < handler.object.size(); i++) {
+			GameObject tempObject = handler.object.get(i);
+			if(tempObject.getId() == ID.ParticulasMuerte) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void render(Graphics g) {
@@ -74,6 +108,8 @@ public class Player extends GameObject {
 		g.setColor(color);
 		g2d.draw(perimetro());
 		coalision();
+		
+		
 		// TODO Auto-generated method stub
 	//	if(id == ID.Player) g.setColor(Color.red);
 	//	g.fillRect(x, y, ancho, altura);

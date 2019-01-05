@@ -7,12 +7,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import HUD.HUDPrincipal;
+import Jugador.Player;
 import base.HandlerEnemigo;
 import base.ID;
 import base.Handler;
 import base.JuegoBase;
 import base.JuegoBase.ESTADO;
-import personajes.Player;
 
 
 public class Menu extends MouseAdapter

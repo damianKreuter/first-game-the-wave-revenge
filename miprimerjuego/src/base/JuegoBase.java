@@ -1,9 +1,10 @@
 package base;
 
-import personajes.Player;
+import personajes.GameObject;
 import personajes.basicEnemy;
 import HUD.HUDBARRA;
 import HUD.HUDPrincipal;
+import Jugador.Player;
 import Menu.Menu;
 import Menu.Menu2;
 import Menu.efectos;
@@ -34,12 +35,16 @@ public class JuegoBase extends Canvas implements Runnable {
 	public static Handler handler;
 
 	private Spawn spawneo;
-	private HandlerEnemigo handlerEnemigo;
+	private static HandlerEnemigo handlerEnemigo;
 	private Menu2 menuss;
 	
 	private HUDPrincipal hud;
 	private HUDBARRA hudbarra;
 	private Random r;
+	
+	private boolean comienzaElJuego;
+	
+	public static boolean haGanado;
 	
 //	private MenuEfectos efectos;
 	private Ventana vent;
@@ -65,20 +70,20 @@ public class JuegoBase extends Canvas implements Runnable {
 	
 	
 	public JuegoBase() {
+		haGanado = false;
 		handler = new Handler();
 		handlerEnemigo = new HandlerEnemigo();
 		
+		comienzaElJuego = false;
 		hud = new HUDPrincipal();
 		hudbarra = new HUDBARRA(BASEALTURAHUD, ANCHO);
 		
 		vent = new Ventana(ANCHO, ALTO, "MI PRIMER JUEGO", this);
 		this.addKeyListener(new keyinput(handler));
 		
-		
-		
 		r = new Random();
-		 
-		menuss = new Menu2(handler, handlerEnemigo, hud);
+		
+		menuss = new Menu2(handler, handlerEnemigo, hud, this);
 		
 		spawneo = new Spawn(handlerEnemigo, hud, handler, menuss);
 		
@@ -126,6 +131,14 @@ public class JuegoBase extends Canvas implements Runnable {
 			handlerEnemigo.addObject(new particulasDeMenu(r.nextInt(JuegoBase.ANCHO)+50, spawneo.noEnHUB(), handlerEnemigo, handler));
 		}
 		
+	}
+	
+	public void eliminarEnemigos() {
+		handlerEnemigo.vaciarObjecto();
+	}
+	
+	public static HandlerEnemigo obtenerHandlerEnemigo() {
+		return handlerEnemigo;
 	}
 	
 	public synchronized void stop() {
@@ -184,6 +197,9 @@ public class JuegoBase extends Canvas implements Runnable {
 	        }
 	                stop();
 	    }
+		public void comienzaElJuego() {
+			comienzaElJuego = true;
+		}
 		
 		private void tick() {
 			handler.tick();
@@ -193,33 +209,89 @@ public class JuegoBase extends Canvas implements Runnable {
 				hud.tick();
 				spawneo.tick();
 				
-				if(HUDPrincipal.VIDA <=0) {
-					vienePartidaTerminada =true;
-					cambiarEstado(ESTADO.Fin);
-					HUDPrincipal.VIDA = 10000;
-					handlerEnemigo.vaciarObjecto();
-					handler.vaciarPersonaje();
-					if(vienePartidaTerminada) {
-						enemigosDeMenu();
-						vienePartidaTerminada = false;
-						
+				if(enJuego()) {
+					if(comienzaElJuego) {
+						spawneo.vaciarHandlerEnemigo();
+						comienzaElJuego = false;
+					}
+					if(HUDPrincipal.VIDA <=0) {
+					//	if(scriptDeJugadorMuereTerminado()) {
+						handlerEnemigo.vaciarObjecto();
+						eliminarEnemigos();
+						handler.vaciarPersonaje();
+						spawneo.vaciarHandlerEnemigo();
+							vienePartidaTerminada =true;
+							cambiarEstado(ESTADO.Fin);
+							HUDPrincipal.VIDA = 10000;
+							
+							if(vienePartidaTerminada) {
+								enemigosDeMenu();
+								vienePartidaTerminada = false;
+							}
+					//	}
+					}
+					
+					if(HUDPrincipal.vidaJefeHUD <= 0 && HUDPrincipal.hayJefe == true) {
+						HUDPrincipal.hayJefe = false;
+						vienePartidaTerminada =true;
+					//	HUDPrincipal.muereJefe();
+						haGanado = true;
+						handlerEnemigo.vaciarObjecto();
+						handler.vaciarPersonaje();
+						cambiarEstado(ESTADO.Fin);	
+						if(vienePartidaTerminada) {
+							enemigosDeMenu();
+							vienePartidaTerminada = false;
+						}
 					}
 				}
 				
-				if(HUDPrincipal.vidaEnemigoHUD <= 0) {
-					HUDPrincipal.hayJefe = false;
-					cambiarEstado(ESTADO.Victoria);
-					HUDPrincipal.muereJefe();
-					handlerEnemigo.vaciarObjecto();
-					handler.vaciarPersonaje();
-				}
 				
-			} else  if(EstadoJuego == ESTADO.Menu || EstadoJuego == ESTADO.Fin || EstadoJuego == ESTADO.Ayuda) {
+			} else if(EstadoJuego == ESTADO.Menu || EstadoJuego == ESTADO.Fin || EstadoJuego == ESTADO.Ayuda || EstadoJuego == ESTADO.Victoria) {
 				menuss.tick();
 				handlerEnemigo.tick();
-
+			}	
+		}
+		
+		public static boolean haGanado() {
+			return haGanado;
+		}
+		
+		private boolean scriptDeJugadorMuereTerminado() {
+			return jugadorMuere();
+		}
+		
+		private boolean jugadorMuere() {
+			for(int i = 0; i < handler.object.size(); i++) {
+				GameObject tempObject = handler.object.get(i);
+				if(tempObject.getId() == ID.Player) {
+					Player jug = (Player) handler.object.get(i);
+					return jug.haMuerto();
+				}
 			}
-			
+			return false;
+		}
+		
+		private boolean obtenerJugador() {
+			Player jug;
+			for(int i = 0; i < handler.object.size(); i++) {
+				if(handler.object.get(i).getId() == ID.Player) {
+					jug = (Player) handler.object.get(i);
+					return jug.haMuerto();
+				}
+			}
+			return false;
+		}
+		
+		
+		private boolean enJuego() {
+			for(int i = 0; i < handler.object.size(); i++) {
+				GameObject tempObject = handler.object.get(i);
+				if(tempObject.getId() == ID.Player) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		private void render() {
@@ -254,5 +326,3 @@ public class JuegoBase extends Canvas implements Runnable {
 			bs.show();
 		}
 }
-
-

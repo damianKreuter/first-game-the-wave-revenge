@@ -12,8 +12,29 @@ import personajes.GameObject;
 public interface ayudaExtra {
 	
 	LinkedList<ID> enemigos = new LinkedList<ID>();
+	
 	public static boolean esUnEnemigo(Enemigo tempObject) {
 		iniciarEsEnemigo();
+		if(enemigos.contains(tempObject.getId())) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static int enemigoEsDeID(HandlerEnemigo enemigo, ID id) {
+		int cantidad = 0;
+		if(enemigo.object.size() > 0) {
+			for(int i = 0; i < enemigo.object.size(); i++) {
+				if(enemigo.object.get(i).getId() == id) {
+					cantidad++;
+				}
+			}
+		}
+		return cantidad;
+	}
+	
+	public static boolean esUnEnemigoQuePersigue(GameObject tempObject) {
+		enemigoQueNoPersigue();
 		if(enemigos.contains(tempObject.getId())) {
 			return true;
 		}
@@ -30,6 +51,14 @@ public interface ayudaExtra {
 		int low = minimo;
 		int high = maximo;
 		return r.nextInt(high-low) + low;
+	}
+	
+	public static void enemigoQueNoPersigue() {
+		enemigos.add(ID.BasicEnemy);
+		enemigos.add(ID.EnemigoRapido);
+		enemigos.add(ID.EnemigoQueVuelve);
+		enemigos.add(ID.EnemigoLineal);
+		enemigos.add(ID.EnemigoMuyDificil);
 	}
 	
 	public static void iniciarEsEnemigo() {
