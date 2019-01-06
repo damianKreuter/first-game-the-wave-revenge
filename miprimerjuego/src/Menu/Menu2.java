@@ -14,6 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import base.Handler;
 import base.JuegoBase;
 import base.JuegoBase.ESTADO;
 import base.Ventana;
+import manejoArchivos.datosDeGuardado;
 import musicayefectosdesonido.audioplayer;
 
 
@@ -69,6 +71,7 @@ public class Menu2 extends JFrame implements MouseListener
 	private JuegoBase juego;
 	
 	private audioplayer audio;
+	private datosDeGuardado dat;
 	
 	public Menu2(Handler handler, HandlerEnemigo handlerEnemigo, HUDPrincipal hud, JuegoBase juegoBase, audioplayer audio) {
 		this.handler = handler;
@@ -80,6 +83,7 @@ public class Menu2 extends JFrame implements MouseListener
 		juego = juegoBase;
 		this.audio = audio;
 		
+		dat = new datosDeGuardado();
 	}
 	
 	public Handler darHandler() {
@@ -132,10 +136,12 @@ public class Menu2 extends JFrame implements MouseListener
 						HUD.setNivel(1);
 						HUD.setPuntaje(0);
 						JuegoBase.cambiarEstado(ESTADO.Juego);
+						HUD.comenzarDeNuevo();
 						handlerEnemigo.vaciarObjecto();
 						handler.vaciarPersonaje();
 						juego.comienzaElJuego();
-						handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio));
+						juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio);
+						handler.addObject(juego.jugador);
 					}
 					
 					//BOTON VOLVER A MENU
@@ -149,10 +155,12 @@ public class Menu2 extends JFrame implements MouseListener
 		//BOTON COMENZAR
 		if(JuegoBase.estadoJuego() == ESTADO.Menu) {
 			if(mouseOver(mx, my, xCaja, ycaja1, anchoCaja, altoCaja)) {
-				handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio));
+				juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio);
+				handler.addObject(juego.jugador);
 				JuegoBase.cambiarEstado(ESTADO.Juego);
 				HUD.setNivel(1);
 				HUD.setPuntaje(0);
+				HUD.comenzarDeNuevo();
 				juego.comienzaElJuego();
 				handlerEnemigo.vaciarObjecto();
 			
@@ -185,10 +193,12 @@ public class Menu2 extends JFrame implements MouseListener
 			if(mouseOver(mx, my, xCaja, ycaja2, anchoCaja, altoCaja)) {
 				HUD.setNivel(1);
 				HUD.setPuntaje(0);
+				HUD.comenzarDeNuevo();
 				JuegoBase.cambiarEstado(ESTADO.Juego);
 				handlerEnemigo.vaciarObjecto();
 				juego.comienzaElJuego();
-				handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio));
+				juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio);
+				handler.addObject(juego.jugador);
 			}
 		}
 	}
@@ -209,7 +219,7 @@ public class Menu2 extends JFrame implements MouseListener
 	public void tick() {
 	}
 	
-	public void render(Graphics g) {
+	public void render(Graphics g) throws FileNotFoundException {
 		Font fnts = new Font("Arial", 1, 10);
 		g.setFont(fnts);
 		g.setColor(Color.white);
@@ -261,7 +271,9 @@ public class Menu2 extends JFrame implements MouseListener
 			g.setColor(Color.white);
 			g.drawString("Puntaje: "+ HUD.getPuntaje(), 125, JuegoBase.BASEALTURAHUD+ 235);
 			
-					
+			g.setFont(fnt);
+			g.setColor(Color.white);
+			g.drawString("Mejor Puntaje: "+ dat.obtenerPuntajeDeArchivo(), 325, JuegoBase.BASEALTURAHUD+ 235);
 			
 			g.setFont(fnt);
 			g.setColor(Color.white);

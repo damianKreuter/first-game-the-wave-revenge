@@ -25,6 +25,7 @@ public class JefeComun extends Enemigo {
 	boolean enCombate, vidaALaMitad;
 	int velocidad;
 	private Spawn spawn;
+	private HUDPrincipal HUD;
 	private int tiempoAEsperar;
 	private audioplayer audio;
 	
@@ -39,7 +40,8 @@ public class JefeComun extends Enemigo {
 		enCombate= false;
 		vidaTotal = 5000;
 		spawn = ss;
-		hud.ponerVidaJefe(vidaTotal);
+		HUD = hud;
+		HUD.ponerVidaJefe(vidaTotal);
 		tiempoAEsperar = 0;
 		this.audio = audio;
 	}
@@ -163,6 +165,9 @@ public class JefeComun extends Enemigo {
 	}
 	
 	public void desaparece() {
-//		handlerEnemigo.removeObject(this);
+		if(HUD.vidaJefeHUD <= 0) {
+			handlerEnemigo.removeObject(this);
+		}
+		
 	}
 }

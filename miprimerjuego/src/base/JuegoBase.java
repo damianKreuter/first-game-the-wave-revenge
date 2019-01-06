@@ -1,23 +1,21 @@
 package base;
 
 import personajes.GameObject;
-import personajes.basicEnemy;
 import HUD.HUDBARRA;
 import HUD.HUDPrincipal;
 import Jugador.Player;
-import Menu.Menu;
 import Menu.Menu2;
 import Menu.efectos;
-import Menu.efectos;
 import Menu.particulasDeMenu;
-import personajes.enemigoBorde;
 import Spawn.Spawn;
+import manejoArchivos.datosDeGuardado;
 import musicayefectosdesonido.audioplayer;
 
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
@@ -47,6 +45,8 @@ public class JuegoBase extends Canvas implements Runnable {
 	private boolean comienzaElJuego;
 	private audioplayer audio;
 	public static boolean haGanado;
+	
+	public static Player jugador;
 	
 //	private MenuEfectos efectos;
 	private Ventana vent;
@@ -92,7 +92,7 @@ public class JuegoBase extends Canvas implements Runnable {
 		
 		menuss = new Menu2(handler, handlerEnemigo, hud, this, audio);
 		
-		spawneo = new Spawn(handlerEnemigo, hud, handler, menuss, audio);
+		spawneo = new Spawn(handlerEnemigo, hud, handler, menuss, audio, this);
 		
 		this.addMouseListener(menuss);
 		this.addMouseMotionListener(new efectos((ANCHO/2)-200/2, 200, 50, 300, 400, 500, handler, menuss));
@@ -238,6 +238,8 @@ public class JuegoBase extends Canvas implements Runnable {
 								vienePartidaTerminada = false;
 							}
 					//	}
+						datosDeGuardado dat = new datosDeGuardado();
+						dat.agregarNuevoPuntajeYNivelMaximo(HUDPrincipal.puntaje, HUDPrincipal.nivel);
 					}
 					
 					if(HUDPrincipal.vidaJefeHUD <= 0 && HUDPrincipal.hayJefe == true) {
@@ -252,6 +254,8 @@ public class JuegoBase extends Canvas implements Runnable {
 							enemigosDeMenu();
 							vienePartidaTerminada = false;
 						}
+						datosDeGuardado dat = new datosDeGuardado();
+						dat.agregarNuevoPuntajeYNivelMaximo(HUDPrincipal.puntaje, HUDPrincipal.nivel);
 					}
 				}
 				
@@ -324,7 +328,12 @@ public class JuegoBase extends Canvas implements Runnable {
 				handlerEnemigo.render(g);
 				hud.render(g);
 			} else if(EstadoJuego == ESTADO.Menu || EstadoJuego == ESTADO.Ayuda || EstadoJuego == ESTADO.Fin) {
-				menuss.render(g);
+				try {
+					menuss.render(g);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				handlerEnemigo.render(g);
 				handler.render(g);
 				

@@ -11,12 +11,12 @@ public class HUDPrincipal {
 	private double verdeValor = 255;
 	
 	private long tiempoSegundos = 0;
-	private int puntaje = 0;
-	public int nivel = 1;
+	public static int puntaje = 0;
+	public static int nivel = 1;
 	
 	public static long vidaJefeHUD = 1;
 	private long milliseconds = 1000000;
-	private static long vidaOriginalEnemigo = 1;;
+	private static long vidaOriginalEnemigo = 1;
 	public static boolean hayJefe = false;
 	
 	public HUDPrincipal() {
@@ -34,6 +34,12 @@ public class HUDPrincipal {
 			nivel++;
 		}
 		
+	}
+	
+	public static void comenzarDeNuevo() {
+		hayJefe = false;
+		 vidaOriginalEnemigo = 1;
+		 vidaJefeHUD = 1;
 	}
 	
 	public void render(Graphics g) {

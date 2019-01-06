@@ -41,12 +41,14 @@ public class Spawn {
 	private int enemigosComunes, enemigoRapido, enemigoInteligente, enemigosQueVuelven, cantidadRayos;
 	
 	private audioplayer audio;
+	private JuegoBase juego;
 	
-	public Spawn(HandlerEnemigo handler, HUDPrincipal h, Handler hh, Menu2 menu, audioplayer audio) {
+	public Spawn(HandlerEnemigo handler, HUDPrincipal h, Handler hh, Menu2 menu, audioplayer audio, JuegoBase juegoBase) {
 		this.handlerEnemigo = handler;
 		this.handler = hh;
 		HUD = h;
 		
+		juego = juegoBase;
 		this.audio = audio;
 		hayJugador = false;
 		salioJefe = false;
@@ -99,6 +101,7 @@ public class Spawn {
 			enemigosQueVuelven = nivel;
 			
 			cantidadRayos = nivel;
+			hayRayoDisponible = true;
 			
 		}
 		if(HUD.getNivel() == 2) {
@@ -336,9 +339,11 @@ public class Spawn {
 		//LA DIFERENCIA ENTRE ESTE RAYO Y EL ANTERIOR ES QUE ESTE APARECERÁ CERCA DE LAS COORDENADAS
 		//DEL JUGADOR
 		hayRayoDisponible = false;
+		
+		
 
-		float xJugador = player.getX();
-		float yJugador = player.getY();
+		float xJugador = juego.jugador.getX();
+		float yJugador = juego.jugador.getY();
 		
 		Random r = new Random();
 		//0 HORIZONTAL--- 1 VERTICAL
