@@ -13,6 +13,7 @@ import base.Handler;
 import base.HandlerEnemigo;
 import base.ID;
 import base.JuegoBase;
+import musicayefectosdesonido.audioplayer;
 import personajes.Enemigo;
 import personajes.EnemigoMuyDificil;
 import personajes.EnemigoQuePersigue;
@@ -39,13 +40,14 @@ public class Spawn {
 	
 	private int enemigosComunes, enemigoRapido, enemigoInteligente, enemigosQueVuelven, cantidadRayos;
 	
+	private audioplayer audio;
 	
-	
-	public Spawn(HandlerEnemigo handler, HUDPrincipal h, Handler hh, Menu2 menu) {
+	public Spawn(HandlerEnemigo handler, HUDPrincipal h, Handler hh, Menu2 menu, audioplayer audio) {
 		this.handlerEnemigo = handler;
 		this.handler = hh;
 		HUD = h;
 		
+		this.audio = audio;
 		hayJugador = false;
 		salioJefe = false;
 		hayRayoDisponible = true;
@@ -204,7 +206,7 @@ public class Spawn {
 			enemigoInteligente = 0;
 			cantidadRayos = 0;
 			eliminarEnemigosQueNoPersiguen();
-			handlerEnemigo.addObject(new JefeComun(-80, JuegoBase.BASEALTURAHUD +20, handlerEnemigo, handler, menu.hudPrincipalMenu(), this));
+			handlerEnemigo.addObject(new JefeComun(-80, JuegoBase.BASEALTURAHUD +20, handlerEnemigo, handler, menu.hudPrincipalMenu(), this, audio));
 			salioJefe = true;
 			
 	//		handlerEnemigo.addObject(new EnemigoQuePersigue(r.nextInt(JuegoBase.ANCHO), r.nextInt(JuegoBase.ALTO), handlerEnemigo, handler));

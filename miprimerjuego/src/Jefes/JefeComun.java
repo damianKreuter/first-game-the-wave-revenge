@@ -13,6 +13,7 @@ import base.Handler;
 import base.HandlerEnemigo;
 import base.ID;
 import base.JuegoBase;
+import musicayefectosdesonido.audioplayer;
 import personajes.Enemigo;
 import personajes.GameObject;
 
@@ -25,8 +26,9 @@ public class JefeComun extends Enemigo {
 	int velocidad;
 	private Spawn spawn;
 	private int tiempoAEsperar;
+	private audioplayer audio;
 	
-	public JefeComun(int x,int y, HandlerEnemigo handE, Handler hands, HUDPrincipal hud, Spawn ss)
+	public JefeComun(int x,int y, HandlerEnemigo handE, Handler hands, HUDPrincipal hud, Spawn ss, audioplayer audio)
 	{
 		super(x, y, ID.JefeComun, handE, 30000, hands);
 		//, hand, 2, hands);
@@ -39,6 +41,7 @@ public class JefeComun extends Enemigo {
 		spawn = ss;
 		hud.ponerVidaJefe(vidaTotal);
 		tiempoAEsperar = 0;
+		this.audio = audio;
 	}
 	
 	public Rectangle perimetro() {
@@ -139,6 +142,7 @@ public class JefeComun extends Enemigo {
 				if(perimetro().intersects(tempObject.perimetro())) {
 					//HACE COALISION POR LO TANTO DAÑO
 					HUDPrincipal.vidaJefeHUD -= tempObject.haceDanio();
+					audioplayer.getSound("danioJefe").play();
 				}
 			}
 		}

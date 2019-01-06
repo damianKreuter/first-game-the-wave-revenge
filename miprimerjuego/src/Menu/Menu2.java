@@ -29,6 +29,7 @@ import base.Handler;
 import base.JuegoBase;
 import base.JuegoBase.ESTADO;
 import base.Ventana;
+import musicayefectosdesonido.audioplayer;
 
 
 
@@ -67,7 +68,9 @@ public class Menu2 extends JFrame implements MouseListener
 	private String estado = "";
 	private JuegoBase juego;
 	
-	public Menu2(Handler handler, HandlerEnemigo handlerEnemigo, HUDPrincipal hud, JuegoBase juegoBase) {
+	private audioplayer audio;
+	
+	public Menu2(Handler handler, HandlerEnemigo handlerEnemigo, HUDPrincipal hud, JuegoBase juegoBase, audioplayer audio) {
 		this.handler = handler;
 		this.handlerEnemigo = handlerEnemigo;
 		HUD = hud;
@@ -75,6 +78,7 @@ public class Menu2 extends JFrame implements MouseListener
 		degradeCaja2 = 30;
 		degradeCaja3 = 30;
 		juego = juegoBase;
+		this.audio = audio;
 		
 	}
 	
@@ -131,7 +135,7 @@ public class Menu2 extends JFrame implements MouseListener
 						handlerEnemigo.vaciarObjecto();
 						handler.vaciarPersonaje();
 						juego.comienzaElJuego();
-						handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo));
+						handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio));
 					}
 					
 					//BOTON VOLVER A MENU
@@ -145,7 +149,7 @@ public class Menu2 extends JFrame implements MouseListener
 		//BOTON COMENZAR
 		if(JuegoBase.estadoJuego() == ESTADO.Menu) {
 			if(mouseOver(mx, my, xCaja, ycaja1, anchoCaja, altoCaja)) {
-				handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo));
+				handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio));
 				JuegoBase.cambiarEstado(ESTADO.Juego);
 				HUD.setNivel(1);
 				HUD.setPuntaje(0);
@@ -184,7 +188,7 @@ public class Menu2 extends JFrame implements MouseListener
 				JuegoBase.cambiarEstado(ESTADO.Juego);
 				handlerEnemigo.vaciarObjecto();
 				juego.comienzaElJuego();
-				handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo));
+				handler.addObject(new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, audio));
 			}
 		}
 	}

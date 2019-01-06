@@ -10,6 +10,7 @@ import HUD.HUDBARRA;
 import HUD.HUDPrincipal;
 import base.ID;
 import base.JuegoBase;
+import musicayefectosdesonido.audioplayer;
 import personajes.Enemigo;
 import personajes.GameObject;
 import base.Handler;
@@ -29,13 +30,15 @@ public class Player extends GameObject {
 	
 	Color color = Color.green;
 	private int altura = 32, ancho = 32;
+	private audioplayer audio;
 	
-	public Player(float x, float y, ID id, Handler hand, HandlerEnemigo handEnemigo) {
+	public Player(float x, float y, ID id, Handler hand, HandlerEnemigo handEnemigo, audioplayer audio) {
 		super(x, y, id);
 		this.handler = hand;
 		handlerEnemigo = handEnemigo;
 		estaVivo = true;
 		terminoScripMuerte = false;
+		this.audio = audio;
 	}
 	
 	public Rectangle perimetro() {
@@ -46,6 +49,10 @@ public class Player extends GameObject {
 		Enemigo enemigo = tocoUnEnemigo();
 		if(enemigo != null) {
 			HUDPrincipal.VIDA -= enemigo.haceDanio();
+	//		if(enemigo.haceDanio() > 0) {
+				audioplayer.getSound("danioPersonaje").play();
+	//		}
+			
 			enemigo.desaparece();
 		}
 	}

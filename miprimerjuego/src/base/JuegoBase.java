@@ -12,6 +12,8 @@ import Menu.efectos;
 import Menu.particulasDeMenu;
 import personajes.enemigoBorde;
 import Spawn.Spawn;
+import musicayefectosdesonido.audioplayer;
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -43,7 +45,7 @@ public class JuegoBase extends Canvas implements Runnable {
 	private Random r;
 	
 	private boolean comienzaElJuego;
-	
+	private audioplayer audio;
 	public static boolean haGanado;
 	
 //	private MenuEfectos efectos;
@@ -78,14 +80,19 @@ public class JuegoBase extends Canvas implements Runnable {
 		hud = new HUDPrincipal();
 		hudbarra = new HUDBARRA(BASEALTURAHUD, ANCHO);
 		
+		audio = new audioplayer();
+		audioplayer.load();
+		
+		
+		
 		vent = new Ventana(ANCHO, ALTO, "MI PRIMER JUEGO", this);
 		this.addKeyListener(new keyinput(handler));
 		
 		r = new Random();
 		
-		menuss = new Menu2(handler, handlerEnemigo, hud, this);
+		menuss = new Menu2(handler, handlerEnemigo, hud, this, audio);
 		
-		spawneo = new Spawn(handlerEnemigo, hud, handler, menuss);
+		spawneo = new Spawn(handlerEnemigo, hud, handler, menuss, audio);
 		
 		this.addMouseListener(menuss);
 		this.addMouseMotionListener(new efectos((ANCHO/2)-200/2, 200, 50, 300, 400, 500, handler, menuss));
@@ -109,6 +116,8 @@ public class JuegoBase extends Canvas implements Runnable {
 				
 	//	handler.addObject(new Player(100, 100, ID.Player));
 		//handler.addObject(new Player(150, 150, ID.Player));
+		
+		audioplayer.getMusic("musica").loop();
 	}
 
 	public static Handler obtenerHandler() {
