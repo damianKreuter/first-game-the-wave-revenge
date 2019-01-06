@@ -3,6 +3,7 @@ package Jugador;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import AyudaExtra.ayudaExtra;
@@ -10,6 +11,7 @@ import HUD.HUDBARRA;
 import HUD.HUDPrincipal;
 import base.ID;
 import base.JuegoBase;
+import hojaDeSprites.Sprites;
 import musicayefectosdesonido.audioplayer;
 import personajes.Enemigo;
 import personajes.GameObject;
@@ -24,21 +26,26 @@ public class Player extends GameObject {
 	Random r = new Random();
 	Handler handler;
 	HandlerEnemigo handlerEnemigo;
+	
+	private BufferedImage imagen_jugador;
+	
 	public boolean estaVivo;
 	public boolean terminoScripMuerte;
 	int tempMuerte = 50;
 	
 	Color color = Color.green;
 	private int altura = 32, ancho = 32;
-	private audioplayer audio;
+	Sprites spritehoja;
 	
-	public Player(float x, float y, ID id, Handler hand, HandlerEnemigo handEnemigo, audioplayer audio) {
+	public Player(float x, float y, ID id, Handler hand, HandlerEnemigo handEnemigo) {
 		super(x, y, id);
 		this.handler = hand;
 		handlerEnemigo = handEnemigo;
 		estaVivo = true;
 		terminoScripMuerte = false;
-		this.audio = audio;
+		Sprites ss = new Sprites(JuegoBase.sprite_hoja);
+		
+		imagen_jugador = ss.darImagen(1, 3, ancho, altura);
 	}
 	
 	public Rectangle perimetro() {
@@ -111,12 +118,14 @@ public class Player extends GameObject {
 	}
 
 	public void render(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		g.setColor(color);
-		g2d.draw(perimetro());
+//		Graphics2D g2d = (Graphics2D) g;
+//		g.setColor(color);
+//		g2d.draw(perimetro());
+		
+		
+		
+		g.drawImage(imagen_jugador, (int)x, (int)y, null);
 		coalision();
-		
-		
 		// TODO Auto-generated method stub
 	//	if(id == ID.Player) g.setColor(Color.red);
 	//	g.fillRect(x, y, ancho, altura);

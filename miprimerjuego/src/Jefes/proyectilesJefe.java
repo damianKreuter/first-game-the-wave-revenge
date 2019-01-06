@@ -23,18 +23,20 @@ public class proyectilesJefe extends Enemigo {
 	Random r = new Random();
 	Color color = new Color(246, 255, 104);
 	private boolean estaEnfase2;
+	public boolean deRetorno;
 	private GameObject player;
 	
 	
 	public proyectilesJefe(float x,float y, HandlerEnemigo handE, Handler hands, boolean enFase2, GameObject jugador, GameObject jefe)
 	{
-		super(x+40, y+40, ID.ProyectilesJefe, handE, 200, hands);
+		super(x+40, y+40, ID.ProyectilesJefe, handE, 100, hands);
 		//, hand, 2, hands);
 		// TODO Auto-generated constructor stub
 		estaEnfase2 = enFase2;
 	//	velX = r.nextInt(21);
 	//	velY = r.nextInt(21);
 		vecesARebotar =  1;
+		deRetorno = false;
 		this.player = jugador;
 		
 		velX = ayudaExtra.vectorXHaciaPersonaje(player.getX(), player.getY(), x, y);
@@ -70,9 +72,11 @@ public class proyectilesJefe extends Enemigo {
 		//		velY = ayudaExtra.vectorYHaciaPersonaje(player, x, y) + ayudaExtra.modificarValorVelocidad();
 				velY = (10 +r.nextInt(11))  * -1;
 				vecesARebotar--;
+				deRetorno = true;
 			} else {
 				velY = (10+r.nextInt(21));
 				vecesARebotar--;
+				deRetorno = true;
 	//			velY = ayudaExtra.vectorYHaciaPersonaje(player, x, y) + ayudaExtra.modificarValorVelocidad();
 			}
 		} 
@@ -81,11 +85,13 @@ public class proyectilesJefe extends Enemigo {
 			if(velX > 0) {
 	//		velX *= -1;
 				velX = (10 +r.nextInt(11))  * -1;
+				deRetorno = true;
 				vecesARebotar--;
 			} else {
 		//		velX = ayudaExtra.vectorXHaciaPersonaje(player, x, y) + ayudaExtra.modificarValorVelocidad();
 				velX = (10+r.nextInt(21));
 				vecesARebotar--;
+				deRetorno = true;
 			}
 		}
 	}
@@ -116,6 +122,10 @@ public class proyectilesJefe extends Enemigo {
 		Graphics2D g2d = (Graphics2D) g;
 		g.setColor(color);
 		g2d.draw(perimetro());
+	}
+	
+	public float haceDanioJefe() {
+		return (danio/10)+50;
 	}
 	
 	public float haceDanio() {

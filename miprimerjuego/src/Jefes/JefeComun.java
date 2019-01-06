@@ -147,6 +147,17 @@ public class JefeComun extends Enemigo {
 					audioplayer.getSound("danioJefe").play();
 				}
 			}
+			
+			if(tempObject.getId() == ID.ProyectilesJefe) {
+				proyectilesJefe proyectil = (proyectilesJefe) tempObject;
+				if(proyectil.deRetorno) {
+					if(perimetro().intersects(tempObject.perimetro())) {
+						//HACE COALISION POR LO TANTO DAÑO
+						HUDPrincipal.vidaJefeHUD -= proyectil.haceDanioJefe();
+						audioplayer.getSound("danioJefe").play();
+					}
+				}
+			}
 		}
 	}
 	

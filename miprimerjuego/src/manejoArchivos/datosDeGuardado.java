@@ -25,7 +25,7 @@ public class datosDeGuardado {
 			if(escaner.hasNext()) {
 				String a = escaner.next();
 				String puntos = escaner.next();
-				puntosOriginales = Integer.parseInt(puntos);
+				puntosOriginales = Integer.parseInt(puntos);		
 				return true;
 			} else {
 				return false;

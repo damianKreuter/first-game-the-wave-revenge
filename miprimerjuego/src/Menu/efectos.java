@@ -25,20 +25,21 @@ public class efectos extends JFrame implements MouseMotionListener {
 	private Graphics dbg;
 	private Image dbImage;
  
-	private int x, y1, y2, y3, ancho, altura, mx, my;
+	private int x, y0, y1, y2, y3, ancho, altura, mx, my;
 	boolean mouseDrag, enPosicion;
-	boolean enCaja1, enCaja2, enCaja3;
+	boolean enCaja1, enCaja2, enCaja3, enCaja0;
 	
 	Handler handler;
 	
 	Menu2 menu;
 	
-	public efectos(int posX, int ancho, int alto, int posy1, int posy2, int posy3, Handler handler, Menu2 m) {
+	public efectos(int posX, int ancho, int alto, int posy0, int posy1, int posy2, int posy3, Handler handler, Menu2 m) {
 		
 		this.handler = handler;
 		x = posX;
 		this.ancho = ancho;
 		altura = alto;
+		y0 = posy0;
 		y1 = posy1;
 		y2 = posy2;
 		y3 = posy3;
@@ -79,6 +80,11 @@ public class efectos extends JFrame implements MouseMotionListener {
 			menu.cambiarDegrade3(30);
 //			handler.addObject(new reflejoBoton(x, y3, ID.Cola, new Color(255, 27, 27), 200, altura, 0.05f, handler, 30)); 
 		}
+		if(enCaja0) {
+			menu.cambiarDegrade0(10); 
+		} else {
+			menu.cambiarDegrade0(30); 
+		}
 		
 		repaint();
 	}
@@ -89,6 +95,7 @@ public class efectos extends JFrame implements MouseMotionListener {
 		mx = e.getX();
 		my = e.getY();
 		
+		enCaja0 = false;
 		enCaja1 = false;
 		enCaja2 = false;
 		enCaja3 = false;
@@ -99,6 +106,7 @@ public class efectos extends JFrame implements MouseMotionListener {
 					enCaja1 = true;
 					enCaja2 = false;
 					enCaja3 = false;
+					enCaja0 = false;
 				} else
 				//EN CAJA 2
 				if(adentro(y2, mx, my)) 
@@ -106,6 +114,7 @@ public class efectos extends JFrame implements MouseMotionListener {
 					enCaja2 = true;
 					enCaja1 = false;
 					enCaja3 = false;
+					enCaja0 = false;
 				} else
 				//EN CAJA 3
 				if(adentro(y3, mx, my)) 
@@ -113,6 +122,14 @@ public class efectos extends JFrame implements MouseMotionListener {
 					enCaja3 = true;
 					enCaja2 = false;
 					enCaja1 = false;
+					enCaja0 = false;
+				} else 
+					//EN CAJA 0
+				if(adentro(y0, mx, my)) {
+					enCaja0 = true;
+					enCaja2 = false;
+					enCaja1 = false;
+					enCaja3 = false;
 				}
 		
 		if(enCaja1) {
@@ -137,6 +154,11 @@ public class efectos extends JFrame implements MouseMotionListener {
 			menu.cambiarDegrade3(30);
 //			handler.addObject(new reflejoBoton(x, y3, ID.Cola, new Color(255, 27, 27), 200, altura, 0.05f, handler, 30)); 
 		}
+		if(enCaja0) {
+			menu.cambiarDegrade0(10); 
+		} else {
+			menu.cambiarDegrade0(30); 
+		}
 	//	e.consume();
 	}
 
@@ -146,16 +168,26 @@ public class efectos extends JFrame implements MouseMotionListener {
 		mx = e.getX();
 		my = e.getY();
 		
+		enCaja0 = false;
 		enCaja1 = false;
 		enCaja2 = false;
 		enCaja3 = false;
 		
 		menu.cambiarXY(mx, my);
 		
+		//EN CAJA 0
+		if(adentro(y0, mx, my)) {
+			enCaja0 = true;
+			enCaja1 = false;
+			enCaja2 = false;
+			enCaja3 = false;
+		}
+		
 		
 		//EN CAJA 1
 		if(adentro(y1, mx, my)) 
 		{
+			enCaja0 = false;
 			enCaja1 = true;
 			enCaja2 = false;
 			enCaja3 = false;
@@ -163,6 +195,7 @@ public class efectos extends JFrame implements MouseMotionListener {
 		//EN CAJA 2
 		if(adentro(y2, mx, my)) 
 		{
+			enCaja0 = false;
 			enCaja2 = true;
 			enCaja1 = false;
 			enCaja3 = false;
@@ -170,9 +203,18 @@ public class efectos extends JFrame implements MouseMotionListener {
 		//EN CAJA 3
 		if(adentro(y3, mx, my)) 
 		{
+			enCaja0 = false;
 			enCaja3 = true;
 			enCaja2 = false;
 			enCaja1 = false;
+		}
+		
+		if(enCaja0){
+			menu.cambiarDegrade0(10);
+//			handler.addObject(new reflejoBoton(x, y3, ID.Cola, new Color(255, 27, 27), 200, altura, 0.05f, handler, 10)); 
+		} else {
+			menu.cambiarDegrade0(30);
+//			handler.addObject(new reflejoBoton(x, y3, ID.Cola, new Color(255, 27, 27), 200, altura, 0.05f, handler, 30)); 
 		}
 		
 		if(enCaja1) {

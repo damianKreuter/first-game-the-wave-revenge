@@ -8,6 +8,7 @@ import Menu.Menu2;
 import Menu.efectos;
 import Menu.particulasDeMenu;
 import Spawn.Spawn;
+import hojaDeSprites.cargarImagen;
 import manejoArchivos.datosDeGuardado;
 import musicayefectosdesonido.audioplayer;
 
@@ -15,6 +16,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
@@ -52,12 +54,17 @@ public class JuegoBase extends Canvas implements Runnable {
 	private Ventana vent;
 	private boolean vienePartidaTerminada;
 	
+	public static BufferedImage sprite_hoja;
+	
 	public enum ESTADO{
 		Menu,
 		Juego,
 		Ayuda,
 		Fin,
-		Victoria
+		Victoria,
+		Controles,
+		Estadisticas,
+		Personalizar
 	};
 	
 	public static ESTADO EstadoJuego = ESTADO.Menu;
@@ -80,23 +87,33 @@ public class JuegoBase extends Canvas implements Runnable {
 		hud = new HUDPrincipal();
 		hudbarra = new HUDBARRA(BASEALTURAHUD, ANCHO);
 		
+		menuss = new Menu2(handler, handlerEnemigo, hud, this);
 		audio = new audioplayer();
 		audioplayer.load();
 		
 		
 		
+		
 		vent = new Ventana(ANCHO, ALTO, "MI PRIMER JUEGO", this);
+		
+		
+		
 		this.addKeyListener(new keyinput(handler));
 		
 		r = new Random();
 		
-		menuss = new Menu2(handler, handlerEnemigo, hud, this, audio);
+		
+		
+		
 		
 		spawneo = new Spawn(handlerEnemigo, hud, handler, menuss, audio, this);
 		
 		this.addMouseListener(menuss);
-		this.addMouseMotionListener(new efectos((ANCHO/2)-200/2, 200, 50, 300, 400, 500, handler, menuss));
+		this.addMouseMotionListener(new efectos((ANCHO/2)-200/2, 200, 50, 200, 300, 400, 500, handler, menuss));
 		vienePartidaTerminada = false;
+		
+		cargarImagen cargarImagenes = new cargarImagen();
+		sprite_hoja = cargarImagenes.cargarImagen("/primersprites.png");
 	
 		if(EstadoJuego == ESTADO.Juego) {
 			//PANTALLA DEL JUEGO, AQUI EMPIEZA A CREAR TODOS LOS ELEMENTOS DEL NIVEL
@@ -328,12 +345,7 @@ public class JuegoBase extends Canvas implements Runnable {
 				handlerEnemigo.render(g);
 				hud.render(g);
 			} else if(EstadoJuego == ESTADO.Menu || EstadoJuego == ESTADO.Ayuda || EstadoJuego == ESTADO.Fin) {
-				try {
-					menuss.render(g);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				menuss.render(g);
 				handlerEnemigo.render(g);
 				handler.render(g);
 				
