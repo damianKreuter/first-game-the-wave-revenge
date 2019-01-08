@@ -18,12 +18,16 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
+import AAConexion.ClienteJuego;
+import AAConexion.ServidorJuego;
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
+import java.net.ServerSocket;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
@@ -84,6 +88,9 @@ public class JuegoBase extends Canvas implements Runnable {
 	}
 	
 	
+	private ClienteJuego socketClie;
+	private ServidorJuego socketServ;
+	
 	public JuegoBase() {
 		haGanado = false;
 		handler = new Handler();
@@ -97,20 +104,11 @@ public class JuegoBase extends Canvas implements Runnable {
 		audio = new audioplayer();
 		audioplayer.load();
 		
-		
-		
-		
 		vent = new Ventana(ANCHO, ALTO, "MI PRIMER JUEGO", this);
-		
-		
 		
 		this.addKeyListener(new keyinput(handler));
 		
 		r = new Random();
-		
-		
-		
-		
 		
 		spawneo = new Spawn(handlerEnemigo, hud, handler, menuss, audio, this);
 		
@@ -141,6 +139,8 @@ public class JuegoBase extends Canvas implements Runnable {
 		//handler.addObject(new Player(150, 150, ID.Player));
 		
 		audioplayer.getMusic("musica").loop();
+		
+		socketClie.sendData("ping".getBytes());
 	}
 
 	public static Handler obtenerHandler() {
@@ -155,6 +155,13 @@ public class JuegoBase extends Canvas implements Runnable {
 		thread = new Thread(this);
 		thread.start();
 		running = true;
+		
+		socketServ = new ServidorJuego(this);
+		socketServ.start();
+		
+		socketClie = new ClienteJuego(this, "localhost");
+		socketClie.start();
+		
 	}
 	
 	private void enemigosDeMenu() {
@@ -223,12 +230,14 @@ public class JuegoBase extends Canvas implements Runnable {
 	                            if(System.currentTimeMillis() - timer > 1000)
 	                            {
 	                                timer += 1000;
-	                    //            System.out.println("FPS: "+ frames);
+	                                System.out.println("FPS: "+ frames);
+	                    			
 	                                frames = 0;
 	                            }
 	        }
 	                stop();
 	    }
+		
 		public void comienzaElJuego() {
 			comienzaElJuego = true;
 		}
