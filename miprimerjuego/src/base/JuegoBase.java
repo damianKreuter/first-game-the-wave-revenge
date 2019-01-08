@@ -7,6 +7,7 @@ import Jugador.Player;
 import Menu.Menu2;
 import Menu.efectos;
 import Menu.particulasDeMenu;
+import Paquete.Packet00Login;
 import Spawn.Spawn;
 import hojaDeSprites.cargarImagen;
 import manejoArchivos.datosDeGuardado;
@@ -30,6 +31,8 @@ import java.io.FileNotFoundException;
 import java.net.ServerSocket;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
+
+import javax.swing.JOptionPane;
 
 
 public class JuegoBase extends Canvas implements Runnable {
@@ -140,7 +143,10 @@ public class JuegoBase extends Canvas implements Runnable {
 		
 		audioplayer.getMusic("musica").loop();
 		
-		socketClie.sendData("ping".getBytes());
+		Packet00Login loginPacket = new Packet00Login(JOptionPane.showInputDialog(this, "Ingrese un usuario"));
+		loginPacket.writeData(socketClie);
+		
+//		socketClie.sendData("ping".getBytes());
 	}
 
 	public static Handler obtenerHandler() {
@@ -230,7 +236,8 @@ public class JuegoBase extends Canvas implements Runnable {
 	                            if(System.currentTimeMillis() - timer > 1000)
 	                            {
 	                                timer += 1000;
-	                                System.out.println("FPS: "+ frames);
+	                               
+	                            //    System.out.println("FPS: "+ frames);
 	                    			
 	                                frames = 0;
 	                            }

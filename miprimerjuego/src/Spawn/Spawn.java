@@ -26,7 +26,7 @@ import personajes.laser;
 
 public class Spawn {
 	
-	private HandlerEnemigo handlerEnemigo;
+	private static HandlerEnemigo handlerEnemigo;
 	private HUDPrincipal HUD;
 	private Handler handler;
 	
@@ -42,6 +42,10 @@ public class Spawn {
 	
 	private audioplayer audio;
 	private JuegoBase juego;
+	
+	public static HandlerEnemigo getHandlerEnemigo() {
+		return handlerEnemigo;
+	}
 	
 	public Spawn(HandlerEnemigo handler, HUDPrincipal h, Handler hh, Menu2 menu, audioplayer audio, JuegoBase juegoBase) {
 		this.handlerEnemigo = handler;

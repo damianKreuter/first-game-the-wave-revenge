@@ -14,7 +14,6 @@ public class ClienteJuego extends Thread{
 	private InetAddress ipAddress;
 	private DatagramSocket socket;
 	private JuegoBase juego;
-	private int puerto = 1331;
 	
 	public ClienteJuego(JuegoBase juegobase, String ip) {
 		this.juego = juegobase;
@@ -49,7 +48,7 @@ public class ClienteJuego extends Thread{
 	}
 	
 	public void sendData(byte[] data) {
-		DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, puerto);
+		DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, 1331);
 		try {
 			socket.send(packet);
 		} catch (IOException e) {
