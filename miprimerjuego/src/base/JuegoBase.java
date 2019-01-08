@@ -12,12 +12,6 @@ import hojaDeSprites.cargarImagen;
 import manejoArchivos.datosDeGuardado;
 import musicayefectosdesonido.audioplayer;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
