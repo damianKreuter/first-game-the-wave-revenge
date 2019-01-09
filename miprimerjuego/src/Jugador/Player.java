@@ -30,6 +30,7 @@ public class Player extends GameObject {
 	private BufferedImage imagen_jugador;
 	
 	public boolean estaVivo;
+	public String nombreJug;
 	public boolean terminoScripMuerte;
 	int tempMuerte = 50;
 	

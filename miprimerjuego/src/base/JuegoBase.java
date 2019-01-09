@@ -9,6 +9,7 @@ import Menu.efectos;
 import Menu.particulasDeMenu;
 import Paquete.Packet00Login;
 import Spawn.Spawn;
+import base.JuegoBase.ESTADO;
 import hojaDeSprites.cargarImagen;
 import manejoArchivos.datosDeGuardado;
 import musicayefectosdesonido.audioplayer;
@@ -62,12 +63,18 @@ public class JuegoBase extends Canvas implements Runnable {
 	public static boolean haGanado;
 	
 	public static Player jugador;
+	public static Player jugadorMP;
 	
 //	private MenuEfectos efectos;
 	private Ventana vent;
 	private boolean vienePartidaTerminada;
 	
+	public static String nombreUser;
+	public static String nombreUserMP;
+	public String nombreSistema;
+	
 	public static BufferedImage sprite_hoja;
+	public static String esperarJugador = "";
 	
 	public enum ESTADO{
 		Menu,
@@ -77,22 +84,23 @@ public class JuegoBase extends Canvas implements Runnable {
 		Victoria,
 		Controles,
 		Estadisticas,
-		Personalizar
+		Personalizar,
+		EsperarJugadores
 	};
 	
-	public static ESTADO EstadoJuego = ESTADO.Menu;
+	public ESTADO EstadoJuego = ESTADO.Menu;
 	
-	public static void cambiarEstado(ESTADO nuevoEstado) {
+	public void cambiarEstado(ESTADO nuevoEstado) {
 		EstadoJuego = nuevoEstado;
 	}
 	
-	public static ESTADO estadoJuego() {
+	public ESTADO estadoJuego() {
 		return EstadoJuego;
 	}
 	
 	
-	private ClienteJuego socketClie;
-	private ServidorJuego socketServ;
+	public ClienteJuego socketClie;
+	public ServidorJuego socketServ;
 	
 	public JuegoBase() {
 		haGanado = false;
@@ -141,12 +149,14 @@ public class JuegoBase extends Canvas implements Runnable {
 	//	handler.addObject(new Player(100, 100, ID.Player));
 		//handler.addObject(new Player(150, 150, ID.Player));
 		
-		audioplayer.getMusic("musica").loop();
-		
-		Packet00Login loginPacket = new Packet00Login(JOptionPane.showInputDialog(this, "Ingrese un usuario"));
+	//	audioplayer.getMusic("musica").loop();
+		socketClie.sendData("ping".getBytes());
+		nombreUser = JOptionPane.showInputDialog(this, "Ingrese un usuario");
+		nombreSistema = nombreUser;
+		Packet00Login loginPacket = new Packet00Login(nombreUser);
 		loginPacket.writeData(socketClie);
 		
-//		socketClie.sendData("ping".getBytes());
+		
 	}
 
 	public static Handler obtenerHandler() {
@@ -162,9 +172,11 @@ public class JuegoBase extends Canvas implements Runnable {
 		thread.start();
 		running = true;
 		
-		socketServ = new ServidorJuego(this);
-		socketServ.start();
-		
+		if(JOptionPane.showConfirmDialog(this, "¿Desea jugar en multijugador?") == 0) {
+			socketServ = new ServidorJuego(this);
+			socketServ.start();
+		}
+
 		socketClie = new ClienteJuego(this, "localhost");
 		socketClie.start();
 		
@@ -247,6 +259,19 @@ public class JuegoBase extends Canvas implements Runnable {
 		
 		public void comienzaElJuego() {
 			comienzaElJuego = true;
+		}
+		
+		public void iniciarElJuego() {
+			comienzaElJuego();
+			jugador = new Player((ANCHO/2)-32, (ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+			jugadorMP = new Player((ANCHO/2)-32, (ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+			handler.addObject(jugador);
+			handler.addObject(jugadorMP);
+			cambiarEstado(ESTADO.Juego);
+			hud.setNivel(1);
+			hud.setPuntaje(0);
+			hud.comenzarDeNuevo();
+			handlerEnemigo.vaciarObjecto();	
 		}
 		
 		private void tick() {
@@ -366,7 +391,9 @@ public class JuegoBase extends Canvas implements Runnable {
 				handler.render(g);
 				handlerEnemigo.render(g);
 				hud.render(g);
-			} else if(EstadoJuego == ESTADO.Menu || EstadoJuego == ESTADO.Ayuda || EstadoJuego == ESTADO.Fin) {
+			} else 
+				//if(EstadoJuego == ESTADO.Menu || EstadoJuego == ESTADO.Ayuda || EstadoJuego == ESTADO.Fin) 
+				{
 				menuss.render(g);
 				handlerEnemigo.render(g);
 				handler.render(g);

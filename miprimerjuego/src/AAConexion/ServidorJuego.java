@@ -21,10 +21,21 @@ public class ServidorJuego extends Thread{
 	private DatagramSocket socket;
 	private JuegoBase juego;
 	private List<PlayerMP> connectedPlayers = new ArrayList<PlayerMP>();
+	private PlayerMP jugadorMP;
+	private PlayerMP jugador1;
+	
+	private boolean jug1ParaJugar;
+	private boolean jug2ParaJugar;
+	
+	private int cantMaxJugadores;
+	private int cantiJugadoresEsperando;
 	
 	public ServidorJuego(JuegoBase juegobase) {
 		this.juego = juegobase;
-		
+		cantMaxJugadores = 2;
+		cantiJugadoresEsperando = 2;
+		jug1ParaJugar = false;
+		jug2ParaJugar = false;
 		try {
 			this.socket = new DatagramSocket(1331);
 		} catch (SocketException e) {
@@ -45,18 +56,74 @@ public class ServidorJuego extends Thread{
 				e.printStackTrace();
 			}
 			
-			parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
-			/*
+			
+			
 			String mensaje = new String(packet.getData());
 			System.out.println("CLIENTE: ["+packet.getAddress().getHostAddress()+":"+packet.getPort()+"]  " + mensaje);
+			if(cantMaxJugadores > 0) {
+				parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
+			}
+			
+			String codigo = mensaje.substring(0, 2).trim();
+			caso00(codigo, mensaje);
+			caso02(codigo, mensaje);
+			
 			
 			String mensaje2 = new String(packet.getData());
 			if(mensaje2.trim().equalsIgnoreCase("ping") ) {
-				System.out.print("Devuelvo pong");
+				System.out.print("Devuelvo pong\n");
 				sendData("pong".getBytes(), packet.getAddress(), packet.getPort());
 			}
-			*/
+			
 		}
+	}
+	
+	private void caso02(String code, String mensaje) {
+		if(code.trim().equalsIgnoreCase("02")) {
+			//SE PASA UNA PETICION PARA JUGAR
+			String nombre = mensaje.substring(2, mensaje.length()-2);
+			cantiJugadoresEsperando++;
+			
+			if(jug1ParaJugar == true || jug2ParaJugar == true) {
+				//JUGAR
+				sendDataToAllClient(("0203").getBytes());
+			} else
+			//ORDENAR LOS NOMBRES, EL HOST ES EL JUGADOR 1, EL CLIENTE ES EL JUGADOR 2
+			if(nombre == juego.nombreUser) {
+				//JUGADOR HOST
+				sendData(("0201esperar").getBytes(), jugador1.ipDireccion, jugador1.puerto);
+				sendData(("0202confirmar").getBytes(), jugadorMP.ipDireccion, jugadorMP.puerto);
+				jug1ParaJugar = true;
+			} else {
+				jug2ParaJugar = true;
+				sendData(("0202confirmar").getBytes(), jugador1.ipDireccion, jugador1.puerto);
+				sendData(("0201esperar").getBytes(), jugadorMP.ipDireccion, jugadorMP.puerto);
+			}
+	//		ordenarNombresDeJugadores(nombre);
+		}
+	}
+	
+	private void caso00(String code, String mensaje) {
+		if(code.trim().equalsIgnoreCase("00")) {
+			//SE PASA UN NOMBRE
+			String nombre = mensaje.substring(2, mensaje.length()-2);
+			
+			//ORDENAR LOS NOMBRES, EL HOST ES EL JUGADOR 1, EL CLIENTE ES EL JUGADOR 2
+			ordenarNombresDeJugadores(nombre);
+		}
+	}
+	
+	
+	
+	private void ordenarNombresDeJugadores(String nombre) {
+		String nombre1 = JuegoBase.nombreUser;
+		
+		sendDataToAllClient(("0001"+nombre1).getBytes());
+		if(cantMaxJugadores == 1) {
+			sendDataToAllClient(("0002"+nombre).getBytes());
+		}
+		cantMaxJugadores--;
+		
 	}
 	
 	private void parsePacket(byte[] data, InetAddress address, int port) {
@@ -70,14 +137,25 @@ public class ServidorJuego extends Thread{
 				System.out.println("["+address.getHostAddress()+":"+port+"] " + packet.getUser() + " ha entrado este virgo al combate");
 				PlayerMP player = null;
 				if(address.getHostName().equalsIgnoreCase("127.0.0.1")) {
-					player = new PlayerMP(250, 250, ID.Player2, Spawn.getHandlerEnemigo(), address, port);
+					if(cantMaxJugadores == 2) {
+						jugador1 = new PlayerMP(250, 250, ID.Player, Spawn.getHandlerEnemigo(), address, port);
+					} else {
+						jugadorMP = new PlayerMP(250, 250, ID.Player, Spawn.getHandlerEnemigo(), address, port);
+					}
+					
 					
 				} else {
-					player = new PlayerMP(250, 250, ID.Player2, Spawn.getHandlerEnemigo(), address, port);
+					if(cantMaxJugadores == 2) {
+						jugador1 = new PlayerMP(250, 250, ID.Player, Spawn.getHandlerEnemigo(), address, port);
+					} else {
+						jugadorMP = new PlayerMP(250, 250, ID.Player, Spawn.getHandlerEnemigo(), address, port);
+					}
 				}
 				if(player != null) {
-					this.connectedPlayers.add(player);
-					JuegoBase.handler.addObject(player);
+					juego.jugadorMP = jugadorMP;
+					
+		//			this.connectedPlayers.add((PlayerMP) juego.jugadorMP);
+					JuegoBase.handler.addObject(juego.jugadorMP);
 				}
 				
 				break;
@@ -100,8 +178,16 @@ public class ServidorJuego extends Thread{
 
 	public void sendDataToAllClient(byte[] data) {
 		// TODO Auto-generated method stub
-		for(PlayerMP p : connectedPlayers) {
-			sendData(data, p.ipDireccion, p.puerto);
+	//	for(PlayerMP p : connectedPlayers) {
+		if(jugadorMP != null) {
+			String dir = jugadorMP.ipDireccion.getHostAddress();
+			int port =  jugadorMP.puerto;
+			sendData(data, jugadorMP.ipDireccion, jugadorMP.puerto);
 		}
+		String dir = jugador1.ipDireccion.getHostAddress();
+		int port =  jugador1.puerto;
+		sendData(data, jugador1.ipDireccion, jugador1.puerto);
+			
+	//	}
 	}
 }

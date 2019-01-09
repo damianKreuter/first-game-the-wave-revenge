@@ -44,6 +44,44 @@ public class ClienteJuego extends Thread{
 			String mensaje = new String(packet.getData());
 			System.out.println("SEVER: " + mensaje);
 			
+			caso000(mensaje);
+			caso020(mensaje);
+		}
+	}
+	
+	private void caso020(String mensaje) {
+		if(mensaje.substring(0, 3).equalsIgnoreCase("020")) {
+			String nombre = mensaje.substring(3, mensaje.length()-3);
+			//ORDENAR LOS NOMBRES, EL HOST ES EL JUGADOR 1, EL CLIENTE ES EL JUGADOR 2
+			String tipo = nombre.substring(0, 1);
+			if(tipo.contains("1")) {
+				//ESPERO A MI CONTRINCANTE
+				juego.esperarJugador = "Esperando otros jugadores";
+			}
+			if(tipo.contains("2")) {
+				juego.esperarJugador = "Confirma la partida";
+			}
+			if(tipo.contains("3")) {
+				//COMIENZA LA PARTIDA
+				juego.esperarJugador = "";
+				juego.iniciarElJuego();
+			}
+		}
+	}
+	
+	private void caso000(String mensaje) {
+		if(mensaje.substring(0, 3).equalsIgnoreCase("000")) {
+			//SE PASA UN NOMBRE
+			String nombre = mensaje.substring(3, mensaje.length()-3);
+			//ORDENAR LOS NOMBRES, EL HOST ES EL JUGADOR 1, EL CLIENTE ES EL JUGADOR 2
+			String tipo = nombre.substring(0, 1);
+			boolean aaa = tipo.contains("1");
+			if(aaa) {
+				String nombress =  nombre.substring(1, nombre.length()-1).trim();
+				juego.nombreUser = nombress;
+			} else {
+				juego.nombreUserMP = nombre.substring(1, nombre.length()-1).trim();
+			}
 		}
 	}
 	

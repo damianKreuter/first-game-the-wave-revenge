@@ -24,6 +24,8 @@ import javax.swing.JFrame;
 
 import HUD.HUDPrincipal;
 import Jugador.Player;
+import Paquete.Packet00Login;
+import Paquete.paqueteEsperarJugador;
 import Spawn.Spawn;
 import base.HandlerEnemigo;
 import base.ID;
@@ -45,7 +47,6 @@ public class Menu2 extends JFrame implements MouseListener
 	private Graphics gg;
 	private Image dbImage;
 	
-	
 	private static Handler handler;
 	private HandlerEnemigo handlerEnemigo;
 	private HUDPrincipal HUD;
@@ -53,6 +54,9 @@ public class Menu2 extends JFrame implements MouseListener
 	
 	//DIMENSIONES DE CAJA EN X, ANCHO Y ALTO
 	private int anchoCaja =200, altoCaja =50, xCaja  = (JuegoBase.ANCHO/2)-anchoCaja/2;
+	
+	//POSICION Y DE CAJA 1
+	private int ycaja0 = 200;
 	
 	//POSICION Y DE CAJA 1
 	private int ycaja1 = 300;
@@ -78,6 +82,7 @@ public class Menu2 extends JFrame implements MouseListener
 	BufferedImage imagenTeclasDireccionales;
 	
 	private datosDeGuardado dat;
+	private String mensajeEsperaParaJugar;
 	
 	public Menu2(Handler handler, HandlerEnemigo handlerEnemigo, HUDPrincipal hud, JuegoBase juegoBase) {
 		this.handler = handler;
@@ -88,8 +93,9 @@ public class Menu2 extends JFrame implements MouseListener
 		degradeCaja2 = 30;
 		degradeCaja3 = 30;
 		
-		juego = juegoBase;
+		mensajeEsperaParaJugar = "";
 		
+		juego = juegoBase;
 		cargarImagen cargarImagenes = new cargarImagen();
 		imagenTeclasDireccionales = cargarImagenes.cargarImagen("/teclasdireccionales.png");
 		
@@ -150,17 +156,17 @@ public class Menu2 extends JFrame implements MouseListener
 		if(cargoVista) {
 			cargoVista = false;
 		//VENTANA DE VICTORIA
-				if(JuegoBase.estadoJuego() == ESTADO.Victoria) {
+				if(juego.estadoJuego() == ESTADO.Victoria) {
 					//BOTON VOLVER A JUGAR
 					if(mouseOver(mx, my, xCaja, ycaja2, anchoCaja, altoCaja)) {
 						HUD.setNivel(1);
 						HUD.setPuntaje(0);
-						JuegoBase.cambiarEstado(ESTADO.Juego);
+						juego.cambiarEstado(ESTADO.Juego);
 						HUD.comenzarDeNuevo();
 						handlerEnemigo.vaciarObjecto();
 						handler.vaciarPersonaje();
 						juego.comienzaElJuego();
-						juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+						juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
 						handler.addObject(juego.jugador);
 					}
 					
@@ -168,29 +174,86 @@ public class Menu2 extends JFrame implements MouseListener
 					if(mouseOver(mx, my, xCaja, ycaja3, anchoCaja, altoCaja)) {
 						handlerEnemigo.vaciarObjecto();
 						handler.vaciarPersonaje();
-						JuegoBase.cambiarEstado(ESTADO.Menu);
+						juego.cambiarEstado(ESTADO.Menu);
 					}
 				}
 		
-		//BOTON COMENZAR
-		if(JuegoBase.estadoJuego() == ESTADO.Menu) {
-			if(mouseOver(mx, my, xCaja, ycaja1, anchoCaja, altoCaja)) {
-				juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
-				handler.addObject(juego.jugador);
-				JuegoBase.cambiarEstado(ESTADO.Juego);
+		if(juego.estadoJuego() == ESTADO.EsperarJugadores) {
+			//BOTON VOLVER A JUGAR
+			if(mouseOver(mx, my, xCaja, ycaja2, anchoCaja, altoCaja)) {
 				HUD.setNivel(1);
 				HUD.setPuntaje(0);
+				juego.cambiarEstado(ESTADO.Juego);
 				HUD.comenzarDeNuevo();
-				juego.comienzaElJuego();
 				handlerEnemigo.vaciarObjecto();
+				handler.vaciarPersonaje();
+				juego.comienzaElJuego();
+				juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+				handler.addObject(juego.jugador);
+				if(juego.nombreUserMP!="") {
+					juego.jugadorMP = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+					handler.addObject(juego.jugadorMP);
+				}
+				
+			}
 			
+			//BOTON VOLVER A MENU
+			if(mouseOver(mx, my, xCaja, ycaja3, anchoCaja, altoCaja)) {
+				handlerEnemigo.vaciarObjecto();
+				handler.vaciarPersonaje();
+				juego.cambiarEstado(ESTADO.Menu);
+			}
+		}
+	/*			
+		//BOTON COMENZAR CON MULTI
+		if(juego.estadoJuego() == ESTADO.Menu) {
+			if(mouseOver(mx, my, xCaja, ycaja1, anchoCaja, altoCaja)) {
+		//		juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+		//		handler.addObject(juego.jugador);
+				juego.cambiarEstado(ESTADO.EsperarJugadores);
+	//			HUD.setNivel(1);
+	//			HUD.setPuntaje(0);
+	//			HUD.comenzarDeNuevo();
+	//			juego.comienzaElJuego();
+	//			handlerEnemigo.vaciarObjecto();
+			
+			}
+		}*/
+		
+		//BOTON COMENZAR SOLO
+		if(juego.estadoJuego() == ESTADO.Menu) {
+			if(mouseOver(mx, my, xCaja, ycaja1, anchoCaja, altoCaja)) {
+				String nombreUserMPa = juego.nombreUserMP;
+					if(nombreUserMPa == null) {
+						juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+						handler.addObject(juego.jugador);
+						juego.cambiarEstado(ESTADO.Juego);
+						HUD.setNivel(1);
+						HUD.setPuntaje(0);
+						HUD.comenzarDeNuevo();	
+						juego.comienzaElJuego();
+						handlerEnemigo.vaciarObjecto();	
+					} else {
+						if(juego.nombreSistema == juego.nombreUser) {
+							//EL JUGADOR HOST QUIERE JUGAR
+							paqueteEsperarJugador esperarPaquete = new paqueteEsperarJugador(juego.nombreSistema);
+							esperarPaquete.writeData(juego.socketClie);
+						} else {
+							paqueteEsperarJugador esperarPaquete = new paqueteEsperarJugador(juego.nombreSistema);
+							esperarPaquete.writeData(juego.socketClie);
+						}
+						
+					
+				}
+				
+					
 			}
 		}
 		
 		//BOTON AYUDA
-		if(JuegoBase.estadoJuego() == ESTADO.Menu) {
+		if(juego.estadoJuego() == ESTADO.Menu) {
 			if(mouseOver(mx, my, xCaja, ycaja2, anchoCaja, altoCaja)) {
-				JuegoBase.cambiarEstado(ESTADO.Ayuda);
+				juego.cambiarEstado(ESTADO.Ayuda);
 			}
 			
 		}
@@ -199,7 +262,7 @@ public class Menu2 extends JFrame implements MouseListener
 		//BOTON CONTROLES
 		if(JuegoBase.estadoJuego() == ESTADO.Ayuda) {
 			if(mouseOver(mx, my, xCaja, 200, anchoCaja, altoCaja)) {
-				JuegoBase.cambiarEstado(ESTADO.Controles);
+				juego.cambiarEstado(ESTADO.Controles);
 		//		Estado estado = JuegoBase.estadoJuego();
 			}
 		}
@@ -207,29 +270,29 @@ public class Menu2 extends JFrame implements MouseListener
 		//BOTON ESTADISTICAS
 		if(JuegoBase.estadoJuego() == ESTADO.Ayuda) {
 			if(mouseOver(mx, my, xCaja, ycaja1, anchoCaja, altoCaja)) {
-				JuegoBase.cambiarEstado(ESTADO.Estadisticas);
+				juego.cambiarEstado(ESTADO.Estadisticas);
 			}
 		}
 		
 		//BOTON CAMBIAR PERSONAJE
 				if(JuegoBase.estadoJuego() == ESTADO.Ayuda) {
 					if(mouseOver(mx, my, xCaja, ycaja2, anchoCaja, altoCaja)) {
-						JuegoBase.cambiarEstado(ESTADO.Personalizar);
+						juego.cambiarEstado(ESTADO.Personalizar);
 					}
 				}
 		
 		//BOTON VOLVER DESDE CONTROLES, ESTADISTICAS O CAMBIAR PERSONAJE
 		if(JuegoBase.estadoJuego() == ESTADO.Personalizar || JuegoBase.estadoJuego() == ESTADO.Controles || JuegoBase.estadoJuego() == ESTADO.Estadisticas) {
 			if(mouseOver(mx, my, xCaja, ycaja3, anchoCaja, altoCaja)) {
-				JuegoBase.cambiarEstado(ESTADO.Ayuda);
+				juego.cambiarEstado(ESTADO.Ayuda);
 			}
 		}		
 		*/
 		
 		//BOTON VOLVER DESDE AYUDA, FIN DE JUEGO Y GANADOR
-		if(JuegoBase.estadoJuego() == ESTADO.Ayuda || JuegoBase.estadoJuego() == ESTADO.Fin) {
+		if(juego.estadoJuego() == ESTADO.Ayuda || juego.estadoJuego() == ESTADO.Fin) {
 			if(mouseOver(mx, my, xCaja, ycaja3, anchoCaja, altoCaja)) {
-				JuegoBase.cambiarEstado(ESTADO.Menu);
+				juego.cambiarEstado(ESTADO.Menu);
 			}
 		}
 		
@@ -242,12 +305,12 @@ public class Menu2 extends JFrame implements MouseListener
 		
 		
 		//BOTON VOLVER A INTENTAR
-		if(JuegoBase.estadoJuego() == ESTADO.Fin) {
+		if(juego.estadoJuego() == ESTADO.Fin) {
 			if(mouseOver(mx, my, xCaja, ycaja2, anchoCaja, altoCaja)) {
 				HUD.setNivel(1);
 				HUD.setPuntaje(0);
 				HUD.comenzarDeNuevo();
-				JuegoBase.cambiarEstado(ESTADO.Juego);
+				juego.cambiarEstado(ESTADO.Juego);
 				handlerEnemigo.vaciarObjecto();
 				juego.comienzaElJuego();
 				juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
@@ -284,7 +347,7 @@ public class Menu2 extends JFrame implements MouseListener
 		
 		//VENTANA DE CONFIGURAR, SOLO MUESTRA INFO RELEVANTE DEL JUEGO
 		// DESDE PERSONALISAR PERSONAJE, VER TOP 10 MEJORES PUNTAJES, 
-		if(JuegoBase.estadoJuego() == ESTADO.Ayuda) {
+		if(juego.estadoJuego() == ESTADO.Ayuda) {
 			Font fnt = new Font("Arial", 1, 50);
 			
 			g.setFont(fnt);
@@ -345,13 +408,141 @@ public class Menu2 extends JFrame implements MouseListener
 			g.setColor(Color.white);
 			g.drawString("Volver", 415, 535);
 		}
+		//VENTANA MENU PRINCIPAL
+				else if(juego.estadoJuego() == ESTADO.Menu) {
+					Font fnt = new Font("Arial", 1, 50);
+
+					g.setFont(fnt);
+					g.setColor(Color.white);
+					g.drawString("MENU", JuegoBase.ANCHO/2 - 75, 100);
+					
+					fnt = new Font("Arial", 1, 25);
+					
+					//CAJA DE MAS ARRIBA
+					
+					g.setFont(fnt);
+					g.setColor(Color.white);
+					g.drawString(estado, 415, 335);
+					
+					g.setColor(Color.WHITE);
+				    g.drawRect(xCaja, ycaja1, anchoCaja, altoCaja);
+					
+				    //RESPLANDOR QUE TIENE CADA CAJA, SI SE PASA EL MOUSE POR ENCIMA SE VUELVE MAS BLANCO EL RESPLANDOR
+				    handler.addObject(new reflejoBoton(xCaja, ycaja1, ID.Cola, new Color(255, 27, 27), 200, altoCaja, 0.05f, handler, degradeCaja1)); 
+				    g.setFont(fnt);
+					g.setColor(Color.white);
+					g.drawString("Jugar", 380, 335);
+					
+					if(juego.esperarJugador != "") {
+					    g.setFont(fnt);
+						g.setColor(Color.white);
+						g.drawString(juego.esperarJugador, 380, 235);						
+					}
+					/*
+					//CAJA DE MAS ARRIBA
+					
+					g.setFont(fnt);
+					g.setColor(Color.white);
+					g.drawString(estado, 415, 335);
+					
+					g.setColor(Color.WHITE);
+				    g.drawRect(xCaja, ycaja1, anchoCaja, altoCaja);
+					
+				    //RESPLANDOR QUE TIENE CADA CAJA, SI SE PASA EL MOUSE POR ENCIMA SE VUELVE MAS BLANCO EL RESPLANDOR
+				    handler.addObject(new reflejoBoton(xCaja, ycaja1, ID.Cola, new Color(255, 27, 27), 200, altoCaja, 0.05f, handler, degradeCaja1)); 
+				    g.setFont(fnt);
+					g.setColor(Color.white);
+					g.drawString("Multiplayer", 380, 335);
+				    */
+					
+					//2º caja AYUDA (AHORA LLAMADO CONFIGURAR PORQUE VAN DESDE PERSONALISAR PERSONAJE, DIFICULTAD, Y ESTADISTICAS)
+					g.setColor(Color.white);
+					g.drawRect(xCaja, ycaja2, anchoCaja, altoCaja);
+					
+					handler.addObject(new reflejoBoton(xCaja, ycaja2, ID.Cola, new Color(255, 27, 27), anchoCaja, altoCaja, 0.05f, handler, degradeCaja2));
+					
+					g.setFont(fnt);
+					g.setColor(Color.white);
+					g.drawString("Configurar", 380, 435);
+					
+					//3º caja SALIR
+				
+					g.setColor(Color.white);
+					g.drawRect(xCaja, ycaja3, anchoCaja, altoCaja);
+					
+					handler.addObject(new reflejoBoton(xCaja, ycaja3, ID.Cola, new Color(255, 27, 27), anchoCaja, altoCaja, 0.05f, handler, degradeCaja3));
+					
+					g.setFont(fnt);
+					g.setColor(Color.white);
+					g.drawString("Salir", 425, 535);
+					
+					fnt = new Font("Arial", 1, 15);
+					
+					g.setFont(fnt);
+					g.setColor(Color.white);
+					g.drawString("Jugador 1: "+ juego.nombreUser, 55, JuegoBase.BASEALTURAHUD+ 175);
+					
+					g.setFont(fnt);
+					g.setColor(Color.white);
+					if(juego.nombreUserMP != null) {
+						g.drawString("Jugador 2: "+ juego.nombreUserMP, 55, JuegoBase.BASEALTURAHUD+ 235);
+					}
+				}
 		
+		//VENTANA ESPERAR JUGADORES
+		
+		else if(juego.estadoJuego() == ESTADO.EsperarJugadores) {
+			
+			Font fnt = new Font("Arial", 1, 50);
+			
+			g.setFont(fnt);
+			g.setColor(Color.white);
+			g.drawString("Esperando jugadores", 100, 100);
+			fnt = new Font("Arial", 1, 25);
+			
+			g.setFont(fnt);
+			g.setColor(Color.white);
+			g.drawString("Jugador 1: "+ juego.nombreUser, 125, JuegoBase.BASEALTURAHUD+ 175);
+			
+			g.setFont(fnt);
+			g.setColor(Color.white);
+			if(juego.nombreUserMP != "") {
+				g.drawString("Jugador 2: "+ juego.nombreUser, 125, JuegoBase.BASEALTURAHUD+ 235);
+			}
+			
+
+			//caja VOLVER A MENU
+		
+			g.setColor(Color.white);
+			g.drawRect(xCaja, ycaja3, anchoCaja, altoCaja);
+			
+			handler.addObject(new reflejoBoton(xCaja, ycaja3, ID.Cola, new Color(255, 27, 27), 200, altoCaja, 0.05f, handler, degradeCaja3)); 
+			
+			g.setFont(fnt);
+			g.setColor(Color.white);
+			g.drawString("Volver al menu", 360, 535);
+			
+			//caja iNTENTAR DE NUEVO
+		
+			g.setColor(Color.white);
+			g.drawRect(xCaja, ycaja2, anchoCaja, altoCaja);
+			
+			handler.addObject(new reflejoBoton(xCaja, ycaja2, ID.Cola, new Color(255, 27, 27), 200, altoCaja, 0.05f, handler, degradeCaja2)); 
+
+			fnt = new Font("Arial", 1, 21);
+			
+			g.setFont(fnt);
+			g.setColor(Color.white);
+			g.drawString("Jugar", 360, 435);
+			
+			
+		} 
 		//VENTANA FIN DE PARTIDA, SE ACTIVA CUANDO EL, O LOS JUGADORES MUEREN
-		else if(JuegoBase.estadoJuego() == ESTADO.Fin) {
+		else if(juego.estadoJuego() == ESTADO.Fin) {
 		
 			String mensajePrincipal = "GAME OVER";
 			//PANTALLA DE FIN DE JUEGO, MUESTRA PUNTAJE Y NIVEL
-			if(JuegoBase.haGanado()) {
+			if(juego.haGanado()) {
 				mensajePrincipal = "HAS GANADO";
 			}
 			Font fnt = new Font("Arial", 1, 50);
@@ -406,7 +597,7 @@ public class Menu2 extends JFrame implements MouseListener
 			
 		} 
 		//VENTANA DE VICTORIA, PARECIDA A LA VENTANA FIN
-		else if(JuegoBase.estadoJuego() == ESTADO.Victoria) {
+		else if(juego.estadoJuego() == ESTADO.Victoria) {
 			Font fnt = new Font("Arial", 1, 50);
 			
 			g.setFont(fnt);
@@ -451,55 +642,10 @@ public class Menu2 extends JFrame implements MouseListener
 			g.drawString("Siguiente nivel", 360, 435);
 		}
 		
-		//VENTANA MENU PRINCIPAL
-		else if(JuegoBase.estadoJuego() == ESTADO.Menu) {
-			Font fnt = new Font("Arial", 1, 50);
-
-			g.setFont(fnt);
-			g.setColor(Color.white);
-			g.drawString("MENU", JuegoBase.ANCHO/2 - 75, 100);
-			
-			fnt = new Font("Arial", 1, 25);
-			
-			//CAJA DE MAS ARRIBA
-			
-			g.setFont(fnt);
-			g.setColor(Color.white);
-			g.drawString(estado, 415, 335);
-			
-			g.setColor(Color.WHITE);
-		    g.drawRect(xCaja, ycaja1, anchoCaja, altoCaja);
-			
-		    //RESPLANDOR QUE TIENE CADA CAJA, SI SE PASA EL MOUSE POR ENCIMA SE VUELVE MAS BLANCO EL RESPLANDOR
-		    handler.addObject(new reflejoBoton(xCaja, ycaja1, ID.Cola, new Color(255, 27, 27), 200, altoCaja, 0.05f, handler, degradeCaja1)); 
-			
-		    
-			
-			//2º caja AYUDA (AHORA LLAMADO CONFIGURAR PORQUE VAN DESDE PERSONALISAR PERSONAJE, DIFICULTAD, Y ESTADISTICAS)
-			g.setColor(Color.white);
-			g.drawRect(xCaja, ycaja2, anchoCaja, altoCaja);
-			
-			handler.addObject(new reflejoBoton(xCaja, ycaja2, ID.Cola, new Color(255, 27, 27), anchoCaja, altoCaja, 0.05f, handler, degradeCaja2));
-			
-			g.setFont(fnt);
-			g.setColor(Color.white);
-			g.drawString("Configurar", 380, 435);
-			
-			//3º caja SALIR
 		
-			g.setColor(Color.white);
-			g.drawRect(xCaja, ycaja3, anchoCaja, altoCaja);
-			
-			handler.addObject(new reflejoBoton(xCaja, ycaja3, ID.Cola, new Color(255, 27, 27), anchoCaja, altoCaja, 0.05f, handler, degradeCaja3));
-			
-			g.setFont(fnt);
-			g.setColor(Color.white);
-			g.drawString("Salir", 425, 535);
-			
-		}
 		
 		//VISTA PARA SABER LOS CONTROLES
-		else if(JuegoBase.estadoJuego() == ESTADO.Controles) {
+		else if(juego.estadoJuego() == ESTADO.Controles) {
 			Font fnt = new Font("Arial", 1, 50);
 			
 			g.drawImage(imagenTeclasDireccionales, 50, 100, null);
@@ -523,7 +669,7 @@ public class Menu2 extends JFrame implements MouseListener
 		}
 		
 		//VISTA PARA VER ESTADISTICAS
-				else if(JuegoBase.estadoJuego() == ESTADO.Estadisticas) {
+				else if(juego.estadoJuego() == ESTADO.Estadisticas) {
 					Font fnt = new Font("Arial", 1, 50);
 					
 					g.drawImage(imagenTeclasDireccionales, 50, 100, null);
@@ -547,7 +693,7 @@ public class Menu2 extends JFrame implements MouseListener
 				}
 		
 		//VISTA CAMBIAR PERSONAJE
-				else if(JuegoBase.estadoJuego() == ESTADO.Personalizar) {
+				else if(juego.estadoJuego() == ESTADO.Personalizar) {
 					Font fnt = new Font("Arial", 1, 50);
 					
 					g.drawImage(imagenTeclasDireccionales, 50, 100, null);
