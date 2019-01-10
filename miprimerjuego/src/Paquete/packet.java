@@ -8,7 +8,7 @@ import AAConexion.ServidorJuego;
 public abstract class packet {
 
 	public static enum PacketTypes {
-		INVALID(-1), LOGIN(00), DESCONECTADO(01), ESPERARJUGADORES(02);
+		INVALID(-1), LOGIN(00), DESCONECTADO(01), ESPERARJUGADORES(02), MOVIMIENTOJUGADOR(03);
 		private int packetId;
 		private PacketTypes(int packetId) {
 			this.packetId = packetId;

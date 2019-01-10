@@ -166,7 +166,7 @@ public class Menu2 extends JFrame implements MouseListener
 						handlerEnemigo.vaciarObjecto();
 						handler.vaciarPersonaje();
 						juego.comienzaElJuego();
-						juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+						juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, 3);
 						handler.addObject(juego.jugador);
 					}
 					
@@ -188,10 +188,10 @@ public class Menu2 extends JFrame implements MouseListener
 				handlerEnemigo.vaciarObjecto();
 				handler.vaciarPersonaje();
 				juego.comienzaElJuego();
-				juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+				juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, 3);
 				handler.addObject(juego.jugador);
 				if(juego.nombreUserMP!="") {
-					juego.jugadorMP = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+					juego.jugadorMP = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, 2);
 					handler.addObject(juego.jugadorMP);
 				}
 				
@@ -223,9 +223,8 @@ public class Menu2 extends JFrame implements MouseListener
 		//BOTON COMENZAR SOLO
 		if(juego.estadoJuego() == ESTADO.Menu) {
 			if(mouseOver(mx, my, xCaja, ycaja1, anchoCaja, altoCaja)) {
-				String nombreUserMPa = juego.nombreUserMP;
-					if(nombreUserMPa == null) {
-						juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+					if(juego.nombreUserMP == null) {
+						juego.jugador = new Player((juego.ANCHO/2)-32, (juego.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, 3);
 						handler.addObject(juego.jugador);
 						juego.cambiarEstado(ESTADO.Juego);
 						HUD.setNivel(1);
@@ -313,7 +312,7 @@ public class Menu2 extends JFrame implements MouseListener
 				juego.cambiarEstado(ESTADO.Juego);
 				handlerEnemigo.vaciarObjecto();
 				juego.comienzaElJuego();
-				juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+				juego.jugador = new Player((JuegoBase.ANCHO/2)-32, (JuegoBase.ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo, 3);
 				handler.addObject(juego.jugador);
 			}
 		}

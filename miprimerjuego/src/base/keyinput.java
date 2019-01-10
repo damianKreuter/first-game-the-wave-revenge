@@ -3,6 +3,8 @@ package base;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import Jugador.Player;
+import Paquete.PaqueteMovimientoJugador;
 import personajes.GameObject;
 
 public class keyinput extends KeyAdapter {
@@ -12,8 +14,17 @@ public class keyinput extends KeyAdapter {
 	private boolean aDerecha = false;
 	private boolean aArriba = false;
 	private boolean aAbajo = false;
-	public keyinput(Handler newhandler) {
+	private JuegoBase juego;
+	private PaqueteMovimientoJugador packetmov;
+	
+	public keyinput(Handler newhandler, JuegoBase juego) {
 		this.handler = newhandler;
+		this.juego = juego;
+		packetmov = new PaqueteMovimientoJugador(juego.nombreSistema);
+	}
+	
+	private boolean esJugadorDeEstaApp(Player tempObject) {
+		return tempObject.nombreJug == juego.nombreSistema;
 		
 	}
 	
@@ -34,7 +45,11 @@ public class keyinput extends KeyAdapter {
 					if(aAbajo) {
 						aAbajo = false;
 					}
-					tempObject.setVelY(velocidadInversa);
+					juego.jugador.setVelY(velocidadInversa);
+					if(juego.nombreUserMP != null) {
+						packetmov.mandarDatos(juego.socketClie, "arriba");
+					}
+			//		tempObject.setVelY(velocidadInversa);
 					aArriba = true;
 					
 				}
@@ -43,21 +58,34 @@ public class keyinput extends KeyAdapter {
 					if(aArriba) {
 						aArriba = false;
 					}
-					tempObject.setVelY(velocidadExtra);
+					juego.jugador.setVelY(velocidadExtra);
+					if(juego.nombreUserMP != null) {
+						packetmov.mandarDatos(juego.socketClie, "abajo");
+					}
+			//		tempObject.setVelY(velocidadExtra);
 					aAbajo = true;
 				}
 				if(key == KeyEvent.VK_LEFT) {
 					if(aDerecha) {
 						aDerecha = false;
 					}
-					tempObject.setVelX(velocidadInversa);
+					juego.jugador.setVelX(velocidadInversa);
+					if(juego.nombreUserMP != null) {
+						packetmov.mandarDatos(juego.socketClie, "izquierda");
+					}
+		//			tempObject.setVelX(velocidadInversa);
 					aIzquierda = true;
 				}
 				if(key == KeyEvent.VK_RIGHT) {
 					if(aIzquierda) {
 						aIzquierda = false;
 					}
-					tempObject.setVelX(velocidadExtra);
+					juego.jugador.setVelX(velocidadExtra);
+					if(juego.nombreUserMP != null) {
+						packetmov.mandarDatos(juego.socketClie, "derecha");
+					}
+					
+			//		tempObject.setVelX(velocidadExtra);
 					aDerecha = true;
 				}
 			}
@@ -73,10 +101,30 @@ public class keyinput extends KeyAdapter {
 			
 			if(tempObject.getId() == ID.Player) {
 				//KEY EVENTS FOR PLAYER 1VK
-				if(key == KeyEvent.VK_UP && aArriba == true) tempObject.setVelY(0);
-				if(key == KeyEvent.VK_DOWN && aAbajo == true) tempObject.setVelY(0);
-				if(key == KeyEvent.VK_LEFT && aIzquierda == true) tempObject.setVelX(0);
-				if(key == KeyEvent.VK_RIGHT && aDerecha == true) tempObject.setVelX(0);
+				if(key == KeyEvent.VK_UP && aArriba == true) {
+					juego.jugador.setVelY(0);
+					if(juego.nombreUserMP != null) {
+					packetmov.mandarDatos(juego.socketClie, "vertical0");
+					}
+				}
+				if(key == KeyEvent.VK_DOWN && aAbajo == true) {
+					juego.jugador.setVelY(0);
+					if(juego.nombreUserMP != null) {
+					packetmov.mandarDatos(juego.socketClie, "vertical0");
+					}
+				}
+				if(key == KeyEvent.VK_LEFT && aIzquierda == true) {
+					juego.jugador.setVelX(0);
+					if(juego.nombreUserMP != null) {
+					packetmov.mandarDatos(juego.socketClie, "horizontal0");
+					}
+				}
+				if(key == KeyEvent.VK_RIGHT && aDerecha == true) {
+					juego.jugador.setVelX(0);
+					if(juego.nombreUserMP != null) {
+					packetmov.mandarDatos(juego.socketClie, "horizontal0");
+					}
+				}
 				
 				/*
 				if(key == KeyEvent.VK_W) tempObject.setVelY(0);

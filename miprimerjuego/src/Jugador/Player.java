@@ -38,7 +38,7 @@ public class Player extends GameObject {
 	private int altura = 32, ancho = 32;
 	Sprites spritehoja;
 	
-	public Player(float x, float y, ID id, Handler hand, HandlerEnemigo handEnemigo) {
+	public Player(float x, float y, ID id, Handler hand, HandlerEnemigo handEnemigo, int tipoImagen) {
 		super(x, y, id);
 		this.handler = hand;
 		handlerEnemigo = handEnemigo;
@@ -46,7 +46,7 @@ public class Player extends GameObject {
 		terminoScripMuerte = false;
 		Sprites ss = new Sprites(JuegoBase.sprite_hoja);
 		
-		imagen_jugador = ss.darImagen(1, 3, ancho, altura);
+		imagen_jugador = ss.darImagen(1, tipoImagen, ancho, altura);
 	}
 	
 	public Rectangle perimetro() {

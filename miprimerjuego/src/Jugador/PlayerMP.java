@@ -12,8 +12,8 @@ public class PlayerMP extends Player{
 	public int puerto;
 	
 	//JUGADOR CONECTADO DESDE UNA IP EXTERNA
-	public PlayerMP(float x, float y, ID id, Handler hand, HandlerEnemigo handEnemigo, InetAddress IpAddress, int port) {
-		super(x, y, id, hand, handEnemigo);
+	public PlayerMP(float x, float y, ID id, Handler hand, HandlerEnemigo handEnemigo, int tipoImagen, InetAddress IpAddress, int port) {
+		super(x, y, id, hand, handEnemigo, tipoImagen);
 		// TODO Auto-generated constructor stub
 		
 		this.ipDireccion = IpAddress;
@@ -21,8 +21,8 @@ public class PlayerMP extends Player{
 	}
 	
 	//JUGADOR CONECTADO DE FORMA LOCAL
-	public PlayerMP(float x, float y, ID id, HandlerEnemigo handEnemigo, InetAddress IpAddress, int port) {
-		super(x, y, id, null, handEnemigo);
+	public PlayerMP(float x, float y, ID id, HandlerEnemigo handEnemigo, int tipoImagen, InetAddress IpAddress, int port) {
+		super(x, y, id, null, handEnemigo, tipoImagen);
 		// TODO Auto-generated constructor stub
 		
 		this.ipDireccion = IpAddress;

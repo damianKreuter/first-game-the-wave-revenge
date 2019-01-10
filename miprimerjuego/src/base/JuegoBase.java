@@ -4,6 +4,7 @@ import personajes.GameObject;
 import HUD.HUDBARRA;
 import HUD.HUDPrincipal;
 import Jugador.Player;
+import Jugador.PlayerMP;
 import Menu.Menu2;
 import Menu.efectos;
 import Menu.particulasDeMenu;
@@ -62,11 +63,12 @@ public class JuegoBase extends Canvas implements Runnable {
 	private audioplayer audio;
 	public static boolean haGanado;
 	
+	public static Player jugadorSistema;
 	public static Player jugador;
 	public static Player jugadorMP;
 	
 //	private MenuEfectos efectos;
-	private Ventana vent;
+	public static Ventana vent;
 	private boolean vienePartidaTerminada;
 	
 	public static String nombreUser;
@@ -75,6 +77,30 @@ public class JuegoBase extends Canvas implements Runnable {
 	
 	public static BufferedImage sprite_hoja;
 	public static String esperarJugador = "";
+	
+	public void establecerJug1(PlayerMP jug) {
+		jugador = jug;
+	}
+	
+	public void establecerJug1(Player jug) {
+		jugador = jug;
+	}
+	
+	public void establecerJug2(PlayerMP jug) {
+		jugadorMP = jug;
+	}
+	
+	public void establecerJug2(Player jug) {
+		jugadorMP = jug;
+	}
+	
+	public float algoDeJugador1() {
+		return jugador.getX();
+	}
+	
+	public float algoDeJugador2() {
+		return jugadorMP.getX();
+	}
 	
 	public enum ESTADO{
 		Menu,
@@ -99,8 +125,8 @@ public class JuegoBase extends Canvas implements Runnable {
 	}
 	
 	
-	public ClienteJuego socketClie;
-	public ServidorJuego socketServ;
+	public static ClienteJuego socketClie;
+	public static ServidorJuego socketServ;
 	
 	public JuegoBase() {
 		haGanado = false;
@@ -115,9 +141,12 @@ public class JuegoBase extends Canvas implements Runnable {
 		audio = new audioplayer();
 		audioplayer.load();
 		
-		vent = new Ventana(ANCHO, ALTO, "MI PRIMER JUEGO", this);
 		
-		this.addKeyListener(new keyinput(handler));
+		
+		vent = new Ventana(ANCHO, ALTO, "MI PRIMER JUEGO", this);
+		new windowHandler(this);
+		
+		this.addKeyListener(new keyinput(handler, this));
 		
 		r = new Random();
 		
@@ -150,11 +179,16 @@ public class JuegoBase extends Canvas implements Runnable {
 		//handler.addObject(new Player(150, 150, ID.Player));
 		
 	//	audioplayer.getMusic("musica").loop();
+		
+		
+		
 		socketClie.sendData("ping".getBytes());
 		nombreUser = JOptionPane.showInputDialog(this, "Ingrese un usuario");
 		nombreSistema = nombreUser;
 		Packet00Login loginPacket = new Packet00Login(nombreUser);
 		loginPacket.writeData(socketClie);
+		
+		this.addKeyListener(new keyinput(handler, this));
 		
 		
 	}
@@ -263,8 +297,8 @@ public class JuegoBase extends Canvas implements Runnable {
 		
 		public void iniciarElJuego() {
 			comienzaElJuego();
-			jugador = new Player((ANCHO/2)-32, (ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
-			jugadorMP = new Player((ANCHO/2)-32, (ALTURAJUEGO/2)-32, ID.Player, handler, handlerEnemigo);
+			
+		//	jugadorMP = new Player(200, 200, ID.Player, handler, handlerEnemigo, 1);
 			handler.addObject(jugador);
 			handler.addObject(jugadorMP);
 			cambiarEstado(ESTADO.Juego);

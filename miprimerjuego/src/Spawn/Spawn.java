@@ -99,6 +99,7 @@ public class Spawn {
 	}
 	
 	private void cambiarCantidadDeEnemigos() {
+		/*
 		int nivel = HUD.getNivel();
 		if(HUD.getNivel() == 1) {
 			enemigosComunes = nivel;
@@ -156,6 +157,7 @@ public class Spawn {
 			enemigoInteligente = 6;
 			cantidadRayos = 6;
 		}
+		*/
 	}
 	
 	private void cargarEnemigosBasico() {
@@ -199,6 +201,7 @@ public class Spawn {
 	
 	
 	public void tick() {
+		/*
 		buscarJugador();
 		cambiarCantidadDeEnemigos();
 		cargarEnemigos();
@@ -222,6 +225,7 @@ public class Spawn {
 			crearLaserInteligente();
 		}
 		HUD.setPuntaje(HUD.getPuntaje()+1);
+		*/
 	}
 
 	private void cargarEnemigos() {
